@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kernel Lens — About</title>
+  <meta name="description" content="Learn about Kernel Lens, the open-source AI tool validator built to cut through hype.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #000000;
+      --text: #FFFFFF;
+      --text-secondary: #999999;
+      --accent: #E8E0D0;
+      --line: #1A1A1A;
+      --line-strong: #333333;
+      --hover-bg: rgba(255, 255, 255, 0.1);
+      --nav-height: 52px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      min-height: 100%;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    body {
+      position: relative;
+      padding-top: var(--nav-height);
+      overflow-x: hidden;
+      font-family: "DM Sans", sans-serif;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0.03;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+      z-index: 0;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: var(--nav-height);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      border-bottom: 1px solid var(--line);
+      background: var(--bg);
+      z-index: 100;
+    }
+
+    .nav-left,
+    .nav-center,
+    .nav-right {
+      display: flex;
+      align-items: center;
+    }
+
+    .nav-left,
+    .nav-right {
+      flex: 1;
+    }
+
+    .nav-center {
+      gap: 24px;
+      justify-content: center;
+    }
+
+    .nav-right {
+      justify-content: flex-end;
+      gap: 12px;
+    }
+
+    .brand,
+    .footer-copy,
+    .eyebrow,
+    .section-label,
+    .github-button,
+    .github-large {
+      font-family: "DM Mono", monospace;
+    }
+
+    .brand {
+      font-size: 12px;
+      letter-spacing: 0.4em;
+      color: var(--text);
+      white-space: nowrap;
+    }
+
+    .nav-link {
+      position: relative;
+      padding: 4px 0;
+      font-size: 12px;
+      letter-spacing: 0.2em;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+    }
+
+    .nav-link.active {
+      color: var(--text);
+    }
+
+    .nav-link.active::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: -15px;
+      height: 1px;
+      background: var(--text);
+    }
+
+    .github-button,
+    .github-icon,
+    .github-large {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--line-strong);
+      background: transparent;
+      color: var(--text);
+      transition: border-color 0.2s ease, background-color 0.2s ease;
+    }
+
+    .github-button {
+      padding: 6px 12px;
+      font-size: 11px;
+      white-space: nowrap;
+    }
+
+    .github-icon {
+      width: 31px;
+      height: 31px;
+    }
+
+    .github-large {
+      margin-top: 18px;
+      padding: 10px 20px;
+      font-size: 12px;
+      letter-spacing: 0.12em;
+    }
+
+    .github-button:hover,
+    .github-button:focus-visible,
+    .github-icon:hover,
+    .github-icon:focus-visible,
+    .github-large:hover,
+    .github-large:focus-visible {
+      border-color: var(--text);
+      background: var(--hover-bg);
+      outline: none;
+    }
+
+    .page {
+      position: relative;
+      z-index: 1;
+      max-width: 600px;
+      margin: 80px auto;
+      padding: 0 24px;
+    }
+
+    .eyebrow {
+      margin: 0;
+      font-size: 11px;
+      letter-spacing: 0.4em;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+    }
+
+    .page-title {
+      margin: 8px 0 0;
+      font-size: 48px;
+      line-height: 1.05;
+      font-weight: 300;
+      color: var(--text);
+    }
+
+    .section {
+      margin-top: 48px;
+    }
+
+    .section-label {
+      margin: 0 0 14px;
+      font-size: 10px;
+      letter-spacing: 0.4em;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+    }
+
+    .section-copy,
+    .steps {
+      margin: 0;
+      font-size: 16px;
+      line-height: 1.8;
+      color: var(--text-secondary);
+    }
+
+    .steps {
+      display: grid;
+      gap: 12px;
+      font-size: 15px;
+    }
+
+    .builder-link {
+      color: var(--accent);
+    }
+
+    .builder-link:hover,
+    .builder-link:focus-visible {
+      color: var(--text);
+      outline: none;
+    }
+
+    .footer {
+      position: relative;
+      z-index: 1;
+      padding: 40px 24px;
+      text-align: center;
+    }
+
+    .footer-copy {
+      margin: 0;
+      font-size: 10px;
+      letter-spacing: 0.3em;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+    }
+
+    @media (max-width: 820px) {
+      .navbar {
+        padding: 0 16px;
+      }
+
+      .nav-center {
+        display: none;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .github-button {
+        display: none;
+      }
+
+      .page {
+        margin: 56px auto;
+        padding: 0 20px;
+      }
+
+      .page-title {
+        font-size: 38px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="navbar">
+    <div class="nav-left">
+      <a class="brand" href="/index.html">KERNEL LENS</a>
+    </div>
+    <nav class="nav-center" aria-label="Primary">
+      <a class="nav-link" href="/index.html">Validator</a>
+      <a class="nav-link active" href="/about.html">About</a>
+    </nav>
+    <div class="nav-right">
+      <a class="github-button" href="https://github.com/ric-kernel/kernel-lens" target="_blank" rel="noreferrer">★ Star on GitHub</a>
+      <a class="github-icon" href="https://github.com/ric-kernel/kernel-lens" target="_blank" rel="noreferrer" aria-label="Kernel Lens on GitHub">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          <path d="M8 1C4.134 1 1 4.134 1 8c0 3.094 2.005 5.718 4.787 6.644.35.064.478-.152.478-.338 0-.167-.006-.61-.01-1.197-1.946.423-2.357-.938-2.357-.938-.318-.808-.777-1.024-.777-1.024-.636-.434.048-.425.048-.425.703.049 1.073.722 1.073.722.625 1.07 1.64.761 2.04.582.063-.453.244-.762.444-.937-1.554-.177-3.188-.777-3.188-3.459 0-.764.273-1.388.721-1.877-.072-.177-.312-.889.069-1.853 0 0 .588-.188 1.926.717A6.69 6.69 0 0 1 8 4.406c.595.003 1.194.08 1.754.235 1.337-.905 1.924-.717 1.924-.717.383.964.143 1.676.07 1.853.449.489.72 1.113.72 1.877 0 2.688-1.637 3.28-3.197 3.454.251.216.475.643.475 1.296 0 .935-.008 1.689-.008 1.919 0 .188.126.406.482.337C12.997 13.715 15 11.093 15 8c0-3.866-3.134-7-7-7Z" fill="currentColor"/>
+        </svg>
+      </a>
+    </div>
+  </header>
+
+  <main class="page">
+    <p class="eyebrow">KERNEL LENS</p>
+    <h1 class="page-title">About</h1>
+
+    <section class="section">
+      <p class="section-label">The Idea</p>
+      <p class="section-copy">The AI tool market launches hundreds of products every month. Most solve the problem you can see. The one underneath stays untouched. Kernel Lens exists to cut through the noise — one honest verdict at a time.</p>
+    </section>
+
+    <section class="section">
+      <p class="section-label">How It Works</p>
+      <div class="steps">
+        <div>01 — Enter any AI tool name or URL</div>
+        <div>02 — Our model analyzes the product against real market data</div>
+        <div>03 — You get a brutally honest verdict. No affiliates. No ads.</div>
+      </div>
+    </section>
+
+    <section class="section">
+      <p class="section-label">The Builder</p>
+      <p class="section-copy">Built by <a class="builder-link" href="https://x.com/rickernel" target="_blank" rel="noreferrer">@rickernel</a> — writing about the gap between AI hype and reality.</p>
+    </section>
+
+    <section class="section">
+      <p class="section-label">Open Source</p>
+      <p class="section-copy">Kernel Lens is open source. Star it, fork it, improve it.</p>
+      <a class="github-large" href="https://github.com/ric-kernel/kernel-lens" target="_blank" rel="noreferrer">★ View on GitHub →</a>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p class="footer-copy">© 2025 Kernel Lens · Built by @rickernel · Open Source</p>
+  </footer>
+</body>
+</html>
