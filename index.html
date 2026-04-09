@@ -80,6 +80,21 @@
       font-weight: 400;
     }
 
+    .brand-counter {
+      margin: 10px 0 0;
+      font-size: 11px;
+      letter-spacing: 0.3em;
+      color: var(--placeholder);
+      text-align: center;
+      opacity: 0;
+      animation-name: introFade, pulseCounter;
+      animation-duration: 0.4s, 3s;
+      animation-timing-function: ease, ease-in-out;
+      animation-delay: 300ms, 1.3s;
+      animation-fill-mode: forwards, none;
+      animation-iteration-count: 1, infinite;
+    }
+
     .main {
       width: 100%;
       max-width: 600px;
@@ -180,6 +195,54 @@
       cursor: wait;
     }
 
+    .recent {
+      width: 100%;
+      margin-top: 26px;
+    }
+
+    .recent[hidden] {
+      display: none;
+    }
+
+    .recent-label {
+      margin: 0 0 10px;
+      font-size: 10px;
+      letter-spacing: 0.4em;
+      text-transform: uppercase;
+      color: var(--line);
+    }
+
+    .recent-list {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      gap: 0;
+    }
+
+    .recent-chip {
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: #555555;
+      font: inherit;
+      font-size: 11px;
+      cursor: pointer;
+      transition: color 0.3s ease;
+    }
+
+    .recent-chip:hover,
+    .recent-chip:focus-visible {
+      color: var(--accent);
+      outline: none;
+    }
+
+    .recent-separator {
+      margin: 0 8px;
+      color: #555555;
+      font-size: 11px;
+    }
+
     .status {
       min-height: 18px;
       margin-top: 22px;
@@ -211,14 +274,21 @@
     .results {
       width: 100%;
       margin-top: 56px;
-      opacity: 0;
-      transform: translateY(10px);
       pointer-events: none;
     }
 
     .results.visible {
-      animation: fadeInUp 0.4s ease forwards;
       pointer-events: auto;
+    }
+
+    .result-row {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+
+    .results.visible .result-row {
+      animation: fadeInUp 0.4s ease forwards;
+      animation-delay: var(--result-delay, 0ms);
     }
 
     .result-row + .result-row {
@@ -246,10 +316,17 @@
       display: inline-flex;
       align-items: center;
       gap: 12px;
-      font-size: 20px;
+      font-size: 28px;
       line-height: 1.2;
       font-weight: 400;
       text-align: left;
+    }
+
+    .verdict-block {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 8px;
     }
 
     .verdict-dot {
@@ -257,6 +334,14 @@
       height: 8px;
       border-radius: 50%;
       flex: 0 0 auto;
+    }
+
+    .verdict-context {
+      margin: 0;
+      font-size: 11px;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+      text-transform: lowercase;
     }
 
     .score-wrap {
@@ -292,6 +377,78 @@
       text-align: right;
     }
 
+    .result-closer {
+      margin-top: 36px;
+      opacity: 0;
+      transform: translateY(10px);
+    }
+
+    .results.visible .result-closer {
+      animation: fadeInUp 0.4s ease forwards;
+      animation-delay: 600ms;
+    }
+
+    .closer-line {
+      width: 100%;
+      height: 1px;
+      background: #111111;
+    }
+
+    .closer-credit {
+      margin: 16px 0 0;
+      font-size: 10px;
+      color: var(--line);
+      letter-spacing: 0.3em;
+      text-align: center;
+    }
+
+    .intro-fade,
+    .intro-rise {
+      opacity: 0;
+      animation-fill-mode: forwards;
+    }
+
+    .intro-fade {
+      animation-name: introFade;
+      animation-duration: 0.4s;
+      animation-timing-function: ease;
+    }
+
+    .intro-rise {
+      transform: translateY(-8px);
+      animation-name: introRise;
+      animation-duration: 0.4s;
+      animation-timing-function: ease;
+    }
+
+    .delay-0 {
+      animation-delay: 0ms;
+    }
+
+    .delay-200 {
+      animation-delay: 200ms;
+    }
+
+    .delay-300 {
+      animation-delay: 300ms;
+    }
+
+    .delay-400 {
+      animation-delay: 400ms;
+    }
+
+    .delay-500 {
+      animation-delay: 500ms;
+    }
+
+    .delay-700 {
+      animation-delay: 700ms;
+    }
+
+    .delay-900 {
+      animation-delay: 900ms;
+    }
+
     @keyframes fadeInUp {
       from {
         opacity: 0;
@@ -300,6 +457,35 @@
       to {
         opacity: 1;
         transform: translateY(0);
+      }
+    }
+
+    @keyframes introFade {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+
+    @keyframes introRise {
+      from {
+        opacity: 0;
+        transform: translateY(-8px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes pulseCounter {
+      0%, 66%, 100% {
+        opacity: 0.4;
+      }
+      16.5%, 49.5% {
+        opacity: 1;
       }
     }
 
@@ -339,23 +525,29 @@
       .status {
         text-align: left;
       }
+
+      .recent-list {
+        justify-content: flex-start;
+      }
     }
   </style>
 </head>
 <body>
   <div class="shell">
     <header class="brand" aria-label="Kernel Lens">
-      <p class="brand-mark">KERNEL LENS</p>
-      <p class="brand-tagline">AI tools. Honest verdicts.</p>
+      <p class="brand-mark intro-fade delay-0">KERNEL LENS</p>
+      <p class="brand-tagline intro-fade delay-200">AI tools. Honest verdicts.</p>
+      <p class="brand-counter" id="counter">— 2,847 tools analyzed —</p>
     </header>
 
     <main class="main">
-      <p class="subtitle">AI Tool Validator</p>
-      <h1 class="title">Truth over hype.</h1>
+      <p class="subtitle intro-rise delay-400">AI Tool Validator</p>
+      <h1 class="title intro-rise delay-500">Truth over hype.</h1>
 
       <form class="analyzer" id="analyzer-form">
         <label class="field" for="query">
           <input
+            class="intro-fade delay-700"
             id="query"
             name="query"
             type="text"
@@ -367,34 +559,41 @@
         </label>
         <p class="hint">Press Enter to analyze</p>
         <div class="controls">
-          <button class="analyze-button" id="submit-button" type="submit">Analyze &rarr;</button>
+          <button class="analyze-button intro-fade delay-900" id="submit-button" type="submit">Analyze &rarr;</button>
+        </div>
+        <div class="recent" id="recent" hidden>
+          <p class="recent-label">Recent</p>
+          <div class="recent-list" id="recent-list"></div>
         </div>
       </form>
 
       <div class="status" id="status" aria-live="polite"></div>
 
       <section class="results" id="results" aria-live="polite" hidden>
-        <div class="result-row">
+        <div class="result-row" style="--result-delay: 0ms;">
           <p class="result-label">Claimed Problem</p>
           <p class="result-value" id="claimed-problem"></p>
         </div>
 
-        <div class="result-row">
+        <div class="result-row" style="--result-delay: 100ms;">
           <p class="result-label">Real Problem</p>
           <p class="result-value" id="real-problem"></p>
         </div>
 
-        <div class="result-row">
+        <div class="result-row" style="--result-delay: 200ms;">
           <p class="result-label">Free Alternative</p>
           <p class="result-value" id="free-alternative"></p>
         </div>
 
-        <div class="result-row">
+        <div class="result-row" style="--result-delay: 300ms;">
           <p class="result-label">Verdict</p>
-          <div class="verdict" id="verdict"></div>
+          <div class="verdict-block">
+            <div class="verdict" id="verdict"></div>
+            <p class="verdict-context" id="verdict-context"></p>
+          </div>
         </div>
 
-        <div class="result-row">
+        <div class="result-row" style="--result-delay: 400ms;">
           <p class="result-label">Problem-Solving Depth</p>
           <div class="score-wrap">
             <div class="score-bar" aria-hidden="true">
@@ -404,24 +603,37 @@
           </div>
         </div>
 
-        <div class="result-row">
+        <div class="result-row" style="--result-delay: 500ms;">
           <p class="result-label">One-Line Summary</p>
           <p class="result-value" id="one-line-summary"></p>
+        </div>
+
+        <div class="result-closer">
+          <div class="closer-line" aria-hidden="true"></div>
+          <p class="closer-credit">— kernel lens by @rickernel —</p>
         </div>
       </section>
     </main>
   </div>
 
   <script>
+    const COUNTER_KEY = "kernelLensAnalysisCount";
+    const HISTORY_KEY = "kernelLensRecentHistory";
+    const DEFAULT_COUNT = 2847;
+
     const form = document.getElementById("analyzer-form");
     const input = document.getElementById("query");
     const status = document.getElementById("status");
     const results = document.getElementById("results");
     const submitButton = document.getElementById("submit-button");
+    const counter = document.getElementById("counter");
+    const recent = document.getElementById("recent");
+    const recentList = document.getElementById("recent-list");
     const claimedProblem = document.getElementById("claimed-problem");
     const realProblem = document.getElementById("real-problem");
     const freeAlternative = document.getElementById("free-alternative");
     const verdict = document.getElementById("verdict");
+    const verdictContext = document.getElementById("verdict-context");
     const scoreFill = document.getElementById("score-fill");
     const scoreText = document.getElementById("score-text");
     const oneLineSummary = document.getElementById("one-line-summary");
@@ -431,6 +643,84 @@
       "Expensive Wrapper": "#E84A4A",
       "Unclear": "#E8C84A"
     };
+
+    const verdictCopy = {
+      "Real Solution": "worth your money",
+      "Expensive Wrapper": "save your subscription",
+      "Unclear": "do more research"
+    };
+
+    let scoreAnimationFrame = null;
+
+    function formatCount(value) {
+      return Number(value).toLocaleString("en-US");
+    }
+
+    function getStoredCount() {
+      const raw = window.localStorage.getItem(COUNTER_KEY);
+      const parsed = Number.parseInt(raw, 10);
+      return Number.isFinite(parsed) ? parsed : DEFAULT_COUNT;
+    }
+
+    function setStoredCount(value) {
+      window.localStorage.setItem(COUNTER_KEY, String(value));
+      counter.textContent = `— ${formatCount(value)} tools analyzed —`;
+    }
+
+    function getHistory() {
+      try {
+        const parsed = JSON.parse(window.localStorage.getItem(HISTORY_KEY) || "[]");
+        return Array.isArray(parsed) ? parsed.filter((item) => typeof item === "string" && item.trim()) : [];
+      } catch (error) {
+        return [];
+      }
+    }
+
+    function saveHistory(history) {
+      window.localStorage.setItem(HISTORY_KEY, JSON.stringify(history.slice(0, 5)));
+    }
+
+    function renderHistory() {
+      const history = getHistory().slice(0, 5);
+      recentList.innerHTML = "";
+
+      if (!history.length) {
+        recent.hidden = true;
+        return;
+      }
+
+      recent.hidden = false;
+
+      history.forEach((item, index) => {
+        const chip = document.createElement("button");
+        chip.type = "button";
+        chip.className = "recent-chip";
+        chip.textContent = item;
+        chip.addEventListener("click", () => {
+          input.value = item;
+          input.focus();
+        });
+        recentList.appendChild(chip);
+
+        if (index < history.length - 1) {
+          const separator = document.createElement("span");
+          separator.className = "recent-separator";
+          separator.textContent = "·";
+          recentList.appendChild(separator);
+        }
+      });
+    }
+
+    function rememberQuery(query) {
+      const normalized = query.trim();
+      if (!normalized) {
+        return;
+      }
+
+      const nextHistory = [normalized, ...getHistory().filter((item) => item !== normalized)].slice(0, 5);
+      saveHistory(nextHistory);
+      renderHistory();
+    }
 
     function escapeHtml(value) {
       return String(value).replace(/[&<>"']/g, (char) => ({
@@ -446,6 +736,11 @@
       results.hidden = true;
       results.classList.remove("visible");
       scoreFill.style.width = "0%";
+      scoreText.textContent = "0/10";
+      if (scoreAnimationFrame) {
+        cancelAnimationFrame(scoreAnimationFrame);
+        scoreAnimationFrame = null;
+      }
     }
 
     function setLoading(isLoading) {
@@ -468,14 +763,49 @@
       const color = verdictColors[value] || verdictColors.Unclear;
       verdict.style.color = color;
       verdict.innerHTML = '<span class="verdict-dot" style="background:' + color + ';"></span><span>' + escapeHtml(value) + "</span>";
+      verdictContext.textContent = verdictCopy[value] || verdictCopy.Unclear;
     }
 
     function renderScore(value) {
-      const score = Math.max(1, Math.min(10, Number(value) || 1));
-      scoreText.textContent = score + "/10";
-      requestAnimationFrame(() => {
-        scoreFill.style.width = String(score * 10) + "%";
-      });
+      const finalScore = Math.max(1, Math.min(10, Number(value) || 1));
+      const duration = 800;
+      const startTime = performance.now();
+
+      if (scoreAnimationFrame) {
+        cancelAnimationFrame(scoreAnimationFrame);
+      }
+
+      const tick = (now) => {
+        const progress = Math.min((now - startTime) / duration, 1);
+        const currentScore = Math.round(finalScore * progress);
+
+        scoreText.textContent = currentScore + "/10";
+        scoreFill.style.width = String(finalScore * progress * 10) + "%";
+
+        if (progress < 1) {
+          scoreAnimationFrame = requestAnimationFrame(tick);
+        } else {
+          scoreText.textContent = finalScore + "/10";
+          scoreFill.style.width = String(finalScore * 10) + "%";
+          scoreAnimationFrame = null;
+        }
+      };
+
+      scoreAnimationFrame = requestAnimationFrame(tick);
+    }
+
+    function incrementCounter() {
+      const nextCount = getStoredCount() + 1;
+      setStoredCount(nextCount);
+    }
+
+    function renderStoredState() {
+      setStoredCount(getStoredCount());
+      renderHistory();
+    }
+
+    function clearStatus() {
+      status.textContent = "";
     }
 
     function renderResults(data) {
@@ -484,13 +814,16 @@
       freeAlternative.textContent = data.free_alternative;
       oneLineSummary.textContent = data.one_line_summary;
       renderVerdict(data.verdict);
-      renderScore(data.score);
-
       results.hidden = false;
       results.classList.remove("visible");
       void results.offsetWidth;
       results.classList.add("visible");
+      requestAnimationFrame(() => {
+        renderScore(data.score);
+      });
     }
+
+    renderStoredState();
 
     form.addEventListener("submit", async (event) => {
       event.preventDefault();
@@ -534,8 +867,10 @@
         }
 
         renderResults(payload);
+        incrementCounter();
+        rememberQuery(query);
         input.value = "";
-        status.textContent = "";
+        clearStatus();
       } catch (error) {
         showError(error instanceof Error ? error.message : "Something went wrong.");
       } finally {
