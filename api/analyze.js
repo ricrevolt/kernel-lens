@@ -1,155 +1,111 @@
-const REQUIRED_KEYS = [
-  "claimed_problem",
-  "real_problem",
-  "free_alternative",
-  "verdict",
-  "score",
-  "one_line_summary"
-];
+const VALID_VERDICTS = ["Real Solution", "Expensive Wrapper", "Unclear"];
 
-const ALLOWED_VERDICTS = new Set([
-  "Real Solution",
-  "Expensive Wrapper",
-  "Unclear"
-]);
-
-function stripMarkdownFences(value) {
-  return String(value || "")
-    .trim()
-    .replace(/^```(?:json)?\s*/i, "")
-    .replace(/\s*```$/i, "")
-    .trim();
-}
-
-function extractJsonObject(value) {
-  const cleaned = stripMarkdownFences(value);
-  const start = cleaned.indexOf("{");
-  const end = cleaned.lastIndexOf("}");
-
-  if (start === -1 || end === -1 || end <= start) {
-    throw new Error("Model response did not contain a valid JSON object.");
-  }
-
-  return cleaned.slice(start, end + 1);
-}
-
-function sanitizePayload(payload) {
-  const sanitized = {};
-
-  for (const key of REQUIRED_KEYS) {
-    if (!(key in payload)) {
-      throw new Error(`Missing key: ${key}`);
-    }
-  }
-
-  sanitized.claimed_problem = String(payload.claimed_problem || "").trim();
-  sanitized.real_problem = String(payload.real_problem || "").trim();
-  sanitized.free_alternative = String(payload.free_alternative || "").trim();
-  sanitized.one_line_summary = String(payload.one_line_summary || "").trim();
-
-  const verdict = String(payload.verdict || "").trim();
-  sanitized.verdict = ALLOWED_VERDICTS.has(verdict) ? verdict : "Unclear";
-
-  const score = Number.parseInt(payload.score, 10);
-  sanitized.score = Number.isFinite(score) ? Math.min(10, Math.max(1, score)) : 1;
-
-  return sanitized;
-}
-
-async function readJsonBody(req) {
-  if (typeof req.body === "object" && req.body !== null) {
-    return req.body;
+function readBody(req) {
+  if (req.body && typeof req.body === "object") {
+    return Promise.resolve(req.body);
   }
 
   return new Promise((resolve, reject) => {
     let raw = "";
-
     req.on("data", (chunk) => {
       raw += chunk;
     });
-
     req.on("end", () => {
       try {
         resolve(raw ? JSON.parse(raw) : {});
       } catch (error) {
-        reject(new Error("Invalid JSON body."));
+        reject(new Error("Invalid JSON body"));
       }
     });
-
     req.on("error", () => {
-      reject(new Error("Unable to read request body."));
+      reject(new Error("Unable to read request body"));
     });
   });
 }
 
 module.exports = async function handler(req, res) {
-  res.setHeader("Content-Type", "application/json");
-
-  if (req.method !== "POST") {
-    res.setHeader("Allow", "POST");
-    return res.status(405).json({ error: "Method not allowed." });
-  }
-
-  if (!process.env.GROQ_API_KEY) {
-    return res.status(500).json({ error: "GROQ_API_KEY is not configured." });
-  }
+  if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 
   try {
-    const body = await readJsonBody(req);
+    const body = await readBody(req);
     const query = typeof body.query === "string" ? body.query.trim() : "";
+    if (!query) return res.status(400).json({ error: "Query required" });
 
-    if (!query) {
-      return res.status(400).json({ error: "Query is required." });
+    let toolContent = query;
+    let isUrl = false;
+
+    try {
+      const url = new URL(query);
+      if (url.protocol === "http:" || url.protocol === "https:") {
+        isUrl = true;
+        try {
+          const jinaResponse = await fetch(`https://r.jina.ai/${query}`, {
+            headers: {
+              "Accept": "text/plain",
+              "X-No-Cache": "true"
+            },
+            signal: AbortSignal.timeout(10000)
+          });
+          if (jinaResponse.ok) {
+            const text = await jinaResponse.text();
+            toolContent = text.substring(0, 3000);
+          }
+        } catch (scrapeError) {
+          toolContent = query;
+        }
+      }
+    } catch (error) {
+      toolContent = query;
     }
+
+    const systemPrompt = `You are a brutally honest AI product analyst with deep knowledge of the SaaS market. You analyze AI tools and return ONLY a valid JSON object - no markdown, no explanation, no text before or after the JSON.
+
+Analyze whether the tool solves a real deep problem or is just a wrapper around existing technology.
+
+For the free_alternative field: ALWAYS suggest only 100% completely free tools - open source projects, tools with permanent free tiers, or public resources. NEVER suggest paid tools, free trials, or freemium tools with heavy limits. If no truly free alternative exists, write exactly: "No free alternative — this fills a real gap."
+
+Be specific, direct, and honest. Do not be diplomatic. If it is a wrapper, say so clearly.`;
+
+    const userPrompt = isUrl
+      ? `Analyze this AI tool based on its website content:\n\n${toolContent}\n\nReturn ONLY a JSON object with these exact keys: claimed_problem (what the tool claims to solve, max 15 words), real_problem (what it actually solves at a deeper level, max 15 words), free_alternative (completely free alternatives only), verdict (exactly one of: "Real Solution", "Expensive Wrapper", "Unclear"), score (integer 1-10 based on how deeply it solves the real problem), one_line_summary (honest one-sentence assessment, max 20 words), key_insight (the one thing most people miss about this tool, max 20 words)`
+      : `Analyze this AI tool: "${toolContent}"\n\nReturn ONLY a JSON object with these exact keys: claimed_problem (what the tool claims to solve, max 15 words), real_problem (what it actually solves at a deeper level, max 15 words), free_alternative (completely free alternatives only), verdict (exactly one of: "Real Solution", "Expensive Wrapper", "Unclear"), score (integer 1-10 based on how deeply it solves the real problem), one_line_summary (honest one-sentence assessment, max 20 words), key_insight (the one thing most people miss about this tool, max 20 words)`;
 
     const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
       method: "POST",
       headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${process.env.GROQ_API_KEY}`
+        "Authorization": `Bearer ${process.env.GROQ_API_KEY}`,
+        "Content-Type": "application/json"
       },
       body: JSON.stringify({
         model: "llama-3.3-70b-versatile",
-        temperature: 0.2,
         messages: [
-          {
-            role: "system",
-            content: "You are a brutally honest AI product analyst. You analyze AI SaaS tools and return a JSON object only, no markdown, no explanation. Evaluate whether the tool solves a real deep problem or is just a wrapper around existing technology. Be precise and concise. For free_alternative, ALWAYS suggest only 100% free tools - open source, completely free tiers, or public resources. Never suggest paid tools, free trials, or freemium tools with heavy limits. If no truly free alternative exists, say exactly: 'No free alternative - this fills a real gap.'"
-          },
-          {
-            role: "user",
-            content: `Analyze this AI tool: ${query}. Return ONLY a JSON object with these exact keys: claimed_problem, real_problem, free_alternative, verdict (must be exactly one of: Real Solution, Expensive Wrapper, Unclear), score (integer 1-10), one_line_summary`
-          }
-        ]
+          { role: "system", content: systemPrompt },
+          { role: "user", content: userPrompt }
+        ],
+        temperature: 0.3,
+        max_tokens: 500
       })
     });
 
-    const data = await response.json().catch(() => null);
-
     if (!response.ok) {
-      const message = data && data.error && data.error.message
-        ? data.error.message
-        : "OpenAI request failed.";
-      return res.status(502).json({ error: message });
+      const error = await response.text();
+      return res.status(500).json({ error: "Analysis failed", details: error });
     }
 
-    const content = data &&
-      data.choices &&
-      data.choices[0] &&
-      data.choices[0].message &&
-      data.choices[0].message.content;
+    const data = await response.json();
+    let content = data.choices[0].message.content.trim();
 
-    if (!content) {
-      throw new Error("OpenAI returned an empty response.");
-    }
+    content = content.replace(/^```json\n?/i, "").replace(/^```\n?/i, "").replace(/\n?```$/i, "").trim();
 
-    const parsed = JSON.parse(extractJsonObject(content));
-    const sanitized = sanitizePayload(parsed);
+    const jsonMatch = content.match(/\{[\s\S]*\}/);
+    if (jsonMatch) content = jsonMatch[0];
 
-    return res.status(200).json(sanitized);
-  } catch (error) {
-    return res.status(500).json({
-      error: error instanceof Error ? error.message : "Unexpected server error."
-    });
+    const parsed = JSON.parse(content);
+    if (!VALID_VERDICTS.includes(parsed.verdict)) parsed.verdict = "Unclear";
+    parsed.score = Math.min(10, Math.max(1, parseInt(parsed.score, 10) || 5));
+
+    return res.status(200).json(parsed);
+  } catch (err) {
+    return res.status(500).json({ error: "Failed to analyze", details: err.message });
   }
 };

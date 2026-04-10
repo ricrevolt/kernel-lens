@@ -24,6 +24,8 @@
       --nav-height: 52px;
       --footer-height: 40px;
       --content-width: 640px;
+      --dim: #666666;
+      --muted-strong: #555555;
     }
 
     * {
@@ -194,10 +196,11 @@
     .hero-hint,
     .results-label,
     .verdict-context,
-    .loading-copy,
-    .results-closer,
     .footer-copy,
-    .score-number {
+    .score-number,
+    .analysis-tool,
+    .analysis-ascii,
+    .analyze-another-top {
       font-family: "DM Mono", monospace;
     }
 
@@ -205,7 +208,7 @@
       margin: 0 0 16px;
       font-size: 10px;
       letter-spacing: 0.4em;
-      color: var(--text-secondary);
+      color: var(--dim);
       text-transform: uppercase;
     }
 
@@ -220,7 +223,7 @@
       padding: 8px 12px;
       border: 0;
       background: transparent;
-      color: var(--text-secondary);
+      color: var(--dim);
       text-align: left;
       cursor: pointer;
       transition: background-color 0.2s ease, color 0.2s ease;
@@ -246,14 +249,14 @@
       display: block;
       margin-top: 4px;
       font-size: 10px;
-      color: var(--text-secondary);
+      color: var(--dim);
       letter-spacing: 0.04em;
     }
 
     .empty-history {
       margin: 0;
       font-size: 11px;
-      color: var(--text-secondary);
+      color: var(--muted-strong);
     }
 
     .sidebar-footer {
@@ -266,7 +269,7 @@
       padding: 0;
       border: 0;
       background: transparent;
-      color: var(--text-secondary);
+      color: var(--muted-strong);
       font-size: 10px;
       cursor: pointer;
       transition: color 0.2s ease;
@@ -291,9 +294,37 @@
       padding: 48px 0;
     }
 
+    .hero.is-hidden,
+    .analysis-screen.is-hidden,
+    .results-shell.is-hidden {
+      display: none;
+    }
+
+    .hero.is-visible,
+    .analysis-screen.is-visible,
+    .results-shell.is-visible {
+      display: flex;
+    }
+
+    .results-shell.is-visible {
+      display: block;
+    }
+
+    .hero.fade-out,
+    .analysis-screen.fade-out,
+    .results-shell.fade-out {
+      animation: fadeOut 0.3s ease forwards;
+    }
+
+    .hero.fade-in,
+    .analysis-screen.fade-in,
+    .results-shell.fade-in {
+      animation: fadeIn 0.35s ease forwards;
+    }
+
     .hero-inner,
     .results-block,
-    .loading-inner {
+    .analysis-inner {
       width: 100%;
       max-width: var(--content-width);
       margin: 0 auto;
@@ -411,65 +442,43 @@
     .delay-600 { animation-delay: 600ms; }
     .delay-750 { animation-delay: 750ms; }
 
-    .loading-state {
+    .analysis-screen {
       display: none;
-      padding: 0 0 96px;
-    }
-
-    .loading-state.visible {
-      display: block;
-    }
-
-    .loading-copy {
-      display: inline-flex;
+      min-height: calc(100vh - var(--nav-height) - var(--footer-height));
       align-items: center;
-      gap: 10px;
-      font-size: 16px;
+      justify-content: center;
+      padding: 48px 0 96px;
+      text-align: center;
+    }
+
+    .analysis-tool {
+      margin: 0;
+      font-size: 13px;
+      letter-spacing: 0.3em;
+      color: var(--dim);
+      text-transform: uppercase;
+    }
+
+    .analysis-ascii {
+      margin: 32px auto 0;
+      max-width: 500px;
+      min-height: 92px;
+      font-size: 13px;
+      line-height: 1.7;
+      color: var(--real);
+      white-space: pre-wrap;
+      text-align: center;
+    }
+
+    .analysis-title {
+      margin: 24px 0 0;
+      font-size: 32px;
+      line-height: 1.2;
+      font-weight: 300;
       color: var(--text);
     }
 
-    .cursor {
-      width: 8px;
-      height: 16px;
-      background: var(--text);
-      animation: blink 1s steps(1) infinite;
-    }
-
-    .scanbox {
-      position: relative;
-      height: 120px;
-      margin-top: 24px;
-      border: 1px solid var(--line);
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.01), rgba(255, 255, 255, 0.03));
-      overflow: hidden;
-    }
-
-    .scanline {
-      position: absolute;
-      left: 0;
-      right: 0;
-      height: 1px;
-      background: var(--accent);
-      animation: scan 1.5s linear infinite;
-    }
-
-    .skeletons {
-      margin-top: 28px;
-      display: grid;
-      gap: 18px;
-    }
-
-    .skeleton-row {
-      height: 14px;
-      background: rgba(255, 255, 255, 0.06);
-      animation: pulse 1.5s ease-in-out infinite;
-    }
-
-    .skeleton-row:nth-child(1) { width: 100%; }
-    .skeleton-row:nth-child(2) { width: 86%; }
-    .skeleton-row:nth-child(3) { width: 93%; }
-
-    .status-error {
+    .analysis-error {
       margin-top: 18px;
       font-family: "DM Mono", monospace;
       font-size: 12px;
@@ -479,11 +488,28 @@
 
     .results-shell {
       display: none;
-      padding: 0 0 96px;
+      padding: 40px 0 96px;
     }
 
-    .results-shell.visible {
-      display: block;
+    .results-header {
+      margin-bottom: 28px;
+    }
+
+    .analyze-another-top {
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: var(--muted-strong);
+      font-size: 11px;
+      letter-spacing: 0.06em;
+      cursor: pointer;
+      transition: color 0.2s ease;
+    }
+
+    .analyze-another-top:hover,
+    .analyze-another-top:focus-visible {
+      color: var(--text);
+      outline: none;
     }
 
     .result-field {
@@ -491,7 +517,7 @@
       transform: translateY(12px);
     }
 
-    .results-shell.visible .result-field {
+    .results-shell.is-visible .result-field {
       animation: fadeInField 0.5s ease forwards;
       animation-delay: var(--delay, 0ms);
     }
@@ -504,7 +530,7 @@
       margin: 0 0 10px;
       font-size: 10px;
       letter-spacing: 0.4em;
-      color: var(--text-secondary);
+      color: var(--dim);
       text-transform: uppercase;
     }
 
@@ -531,7 +557,7 @@
     .verdict-context {
       margin: 10px 0 0;
       font-size: 11px;
-      color: var(--text-secondary);
+      color: var(--dim);
       letter-spacing: 0.06em;
       text-transform: lowercase;
     }
@@ -573,30 +599,10 @@
       font-style: italic;
     }
 
-    .results-end {
-      margin-top: 36px;
-      padding-top: 18px;
-      border-top: 1px solid var(--line);
-    }
-
-    .results-closer {
-      margin: 0;
-      font-size: 10px;
-      color: var(--text-secondary);
-      letter-spacing: 0.3em;
-      text-align: center;
-    }
-
-    .results-actions {
-      margin-top: 20px;
-      text-align: center;
-    }
-
-    .analyze-again {
-      font-size: 11px;
-      color: var(--text-secondary);
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
+    .insight-value {
+      font-size: 15px;
+      line-height: 1.7;
+      color: var(--accent);
     }
 
     .footer {
@@ -655,19 +661,14 @@
       }
     }
 
-    @keyframes blink {
-      0%, 49% { opacity: 1; }
-      50%, 100% { opacity: 0; }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
     }
 
-    @keyframes scan {
-      from { transform: translateY(0); }
-      to { transform: translateY(118px); }
-    }
-
-    @keyframes pulse {
-      0%, 100% { opacity: 0.3; }
-      50% { opacity: 0.6; }
+    @keyframes fadeOut {
+      from { opacity: 1; }
+      to { opacity: 0; }
     }
 
     @media (max-width: 1024px) {
@@ -684,12 +685,12 @@
         margin-left: 0;
       }
 
-      .hero {
+      .hero,
+      .analysis-screen {
         min-height: auto;
         padding: 72px 0 56px;
       }
 
-      .loading-state,
       .results-shell {
         padding-bottom: 72px;
       }
@@ -719,6 +720,10 @@
       .footer-copy.center-copy {
         display: none;
       }
+
+      .analysis-title {
+        font-size: 26px;
+      }
     }
 
     @media (max-width: 560px) {
@@ -737,6 +742,10 @@
       .score-row {
         flex-direction: column;
         align-items: flex-start;
+      }
+
+      .analysis-ascii {
+        font-size: 12px;
       }
 
       .footer {
@@ -764,8 +773,8 @@
       <a class="nav-link" href="/about.html">About</a>
     </nav>
     <div class="nav-right">
-      <a class="github-button" href="https://github.com/ric-kernel/kernel-lens" target="_blank" rel="noreferrer">★ Star on GitHub</a>
-      <a class="github-icon" href="https://github.com/ric-kernel/kernel-lens" target="_blank" rel="noreferrer" aria-label="Kernel Lens on GitHub">
+      <a class="github-button" href="https://github.com/ricrevolt/kernel-lens" target="_blank" rel="noreferrer">★ Star on GitHub</a>
+      <a class="github-icon" href="https://github.com/ricrevolt/kernel-lens" target="_blank" rel="noreferrer" aria-label="Kernel Lens on GitHub">
         <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
           <path d="M8 1C4.134 1 1 4.134 1 8c0 3.094 2.005 5.718 4.787 6.644.35.064.478-.152.478-.338 0-.167-.006-.61-.01-1.197-1.946.423-2.357-.938-2.357-.938-.318-.808-.777-1.024-.777-1.024-.636-.434.048-.425.048-.425.703.049 1.073.722 1.073.722.625 1.07 1.64.761 2.04.582.063-.453.244-.762.444-.937-1.554-.177-3.188-.777-3.188-3.459 0-.764.273-1.388.721-1.877-.072-.177-.312-.889.069-1.853 0 0 .588-.188 1.926.717A6.69 6.69 0 0 1 8 4.406c.595.003 1.194.08 1.754.235 1.337-.905 1.924-.717 1.924-.717.383.964.143 1.676.07 1.853.449.489.72 1.113.72 1.877 0 2.688-1.637 3.28-3.197 3.454.251.216.475.643.475 1.296 0 .935-.008 1.689-.008 1.919 0 .188.126.406.482.337C12.997 13.715 15 11.093 15 8c0-3.866-3.134-7-7-7Z" fill="currentColor"/>
         </svg>
@@ -783,7 +792,7 @@
     </aside>
 
     <main class="main">
-      <section class="hero">
+      <section class="hero is-visible" id="hero-section">
         <div class="hero-inner">
           <p class="hero-label intro-item delay-0">AI Tool Validator</p>
           <h1 class="hero-title intro-item delay-150">Truth over hype.</h1>
@@ -809,45 +818,43 @@
         </div>
       </section>
 
-      <section class="loading-state" id="loading-state" aria-live="polite">
-        <div class="loading-inner">
-          <div class="loading-copy">analyzing... <span class="cursor" aria-hidden="true"></span></div>
-          <div class="scanbox" aria-hidden="true">
-            <div class="scanline"></div>
-          </div>
-          <div class="skeletons" aria-hidden="true">
-            <div class="skeleton-row"></div>
-            <div class="skeleton-row"></div>
-            <div class="skeleton-row"></div>
-          </div>
-          <div class="status-error" id="status-error"></div>
+      <section class="analysis-screen is-hidden" id="analysis-screen" aria-live="polite">
+        <div class="analysis-inner">
+          <p class="analysis-tool" id="analysis-tool"></p>
+          <pre class="analysis-ascii" id="analysis-ascii"></pre>
+          <h2 class="analysis-title" id="analysis-title"></h2>
+          <div class="analysis-error" id="analysis-error"></div>
         </div>
       </section>
 
-      <section class="results-shell" id="results-shell" aria-live="polite">
+      <section class="results-shell is-hidden" id="results-shell" aria-live="polite">
         <div class="results-block">
+          <div class="results-header">
+            <button class="analyze-another-top" id="analyze-another-top" type="button">← Analyze another tool</button>
+          </div>
+
           <div class="result-field" style="--delay: 0ms;">
             <p class="results-label">Claimed Problem</p>
             <p class="results-value" id="claimed-problem"></p>
           </div>
 
-          <div class="result-field" style="--delay: 100ms;">
+          <div class="result-field" style="--delay: 120ms;">
             <p class="results-label">Real Problem</p>
             <p class="results-value real-problem" id="real-problem"></p>
           </div>
 
-          <div class="result-field" style="--delay: 200ms;">
+          <div class="result-field" style="--delay: 240ms;">
             <p class="results-label">Free Alternative</p>
             <p class="results-value" id="free-alternative"></p>
           </div>
 
-          <div class="result-field" style="--delay: 300ms;">
+          <div class="result-field" style="--delay: 360ms;">
             <p class="results-label">Verdict</p>
             <p class="verdict-value" id="verdict"></p>
             <p class="verdict-context" id="verdict-context"></p>
           </div>
 
-          <div class="result-field" style="--delay: 400ms;">
+          <div class="result-field" style="--delay: 480ms;">
             <p class="results-label">Problem-Solving Depth</p>
             <div class="score-row">
               <div class="score-track" aria-hidden="true">
@@ -857,16 +864,14 @@
             </div>
           </div>
 
-          <div class="result-field" style="--delay: 500ms;">
+          <div class="result-field" style="--delay: 600ms;">
             <p class="results-label">One-Line Summary</p>
             <p class="results-value summary-value" id="one-line-summary"></p>
           </div>
 
-          <div class="results-end result-field" style="--delay: 600ms;">
-            <p class="results-closer">— kernel lens · @rickernel —</p>
-            <div class="results-actions">
-              <button class="analyze-again" id="analyze-again" type="button">Analyze Another →</button>
-            </div>
+          <div class="result-field" style="--delay: 720ms;">
+            <p class="results-label">Key Insight</p>
+            <p class="results-value insight-value" id="key-insight"></p>
           </div>
         </div>
       </section>
@@ -874,16 +879,25 @@
   </div>
 
   <footer class="footer">
-    <div class="footer-copy">© 2025 Kernel Lens</div>
+    <div class="footer-copy">© 2026 Kernel Lens</div>
     <div class="footer-copy center-copy">Open Source · No Ads · No Affiliates</div>
     <div class="footer-copy">Built by <a class="footer-link" href="https://x.com/rickernel" target="_blank" rel="noreferrer">@rickernel</a></div>
   </footer>
 
-  <script>
+    <script>
     const COUNTER_KEY = "kernelLensAnalysisCount";
     const HISTORY_KEY = "kernelLensHistory";
     const DEFAULT_COUNT = 2847;
     const MAX_HISTORY = 10;
+    const SPINNER_CHARS = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"];
+    const ANALYSIS_STAGES = [
+      "scanning product surface...",
+      "extracting core claims...",
+      "identifying real problem...",
+      "checking free alternatives...",
+      "calculating verdict...",
+      "finalizing analysis..."
+    ];
 
     const verdictColors = {
       "Real Solution": "#4AE88A",
@@ -903,8 +917,12 @@
     const counterNode = document.getElementById("analysis-counter");
     const historyList = document.getElementById("history-list");
     const clearHistoryButton = document.getElementById("clear-history");
-    const loadingState = document.getElementById("loading-state");
-    const statusError = document.getElementById("status-error");
+    const heroSection = document.getElementById("hero-section");
+    const analysisScreen = document.getElementById("analysis-screen");
+    const analysisToolNode = document.getElementById("analysis-tool");
+    const analysisAsciiNode = document.getElementById("analysis-ascii");
+    const analysisTitleNode = document.getElementById("analysis-title");
+    const analysisErrorNode = document.getElementById("analysis-error");
     const resultsShell = document.getElementById("results-shell");
     const claimedProblemNode = document.getElementById("claimed-problem");
     const realProblemNode = document.getElementById("real-problem");
@@ -914,9 +932,21 @@
     const scoreFillNode = document.getElementById("score-fill");
     const scoreNumberNode = document.getElementById("score-number");
     const oneLineSummaryNode = document.getElementById("one-line-summary");
-    const analyzeAgainButton = document.getElementById("analyze-again");
+    const keyInsightNode = document.getElementById("key-insight");
+    const analyzeAnotherTopButton = document.getElementById("analyze-another-top");
 
     let scoreFrame = null;
+    let spinnerInterval = null;
+    let stageInterval = null;
+    let progressFrame = null;
+    let activeRequest = false;
+    let stageIndex = 0;
+    let spinnerIndex = 0;
+    let fakeProgress = 0;
+
+    function wait(ms) {
+      return new Promise((resolve) => setTimeout(resolve, ms));
+    }
 
     function formatCount(value) {
       return new Intl.NumberFormat("en-US").format(value);
@@ -965,9 +995,7 @@
       const hour = 60 * minute;
       const day = 24 * hour;
 
-      if (diff < minute) {
-        return "just now";
-      }
+      if (diff < minute) return "just now";
       if (diff < hour) {
         const minutes = Math.max(1, Math.floor(diff / minute));
         return minutes + (minutes === 1 ? " min ago" : " mins ago");
@@ -993,9 +1021,7 @@
       }
 
       history.forEach((entry) => {
-        if (!entry || typeof entry.query !== "string") {
-          return;
-        }
+        if (!entry || typeof entry.query !== "string") return;
 
         const button = document.createElement("button");
         button.type = "button";
@@ -1003,8 +1029,7 @@
         button.innerHTML = '<span class="history-name">' + escapeHtml(truncateLabel(entry.query)) + '</span><span class="history-time">' + escapeHtml(relativeTime(entry.timestamp || Date.now())) + "</span>";
         button.addEventListener("click", () => {
           queryInput.value = entry.query;
-          queryInput.focus();
-          window.scrollTo({ top: 0, behavior: "smooth" });
+          startAnalysis(entry.query);
         });
         historyList.appendChild(button);
       });
@@ -1012,9 +1037,7 @@
 
     function rememberAnalysis(query) {
       const normalized = query.trim();
-      if (!normalized) {
-        return;
-      }
+      if (!normalized) return;
 
       const timestamp = Date.now();
       const existing = getHistory().filter((entry) => entry && entry.query !== normalized);
@@ -1023,39 +1046,120 @@
       renderHistory();
     }
 
-    function clearResults() {
-      resultsShell.classList.remove("visible");
-      verdictNode.textContent = "";
-      verdictContextNode.textContent = "";
-      scoreFillNode.style.width = "0%";
-      scoreFillNode.style.background = "var(--accent)";
-      scoreNumberNode.textContent = "0 / 10";
-      realProblemNode.classList.remove("emphasis");
+    function incrementCounter() {
+      setCount(getCount() + 1);
+    }
+
+    function setInteractiveState(isBusy) {
+      queryInput.disabled = isBusy;
+      submitButton.disabled = isBusy;
+      activeRequest = isBusy;
+    }
+
+    function clearScoreAnimation() {
       if (scoreFrame) {
         cancelAnimationFrame(scoreFrame);
         scoreFrame = null;
       }
     }
 
-    function showLoading() {
-      statusError.textContent = "";
-      clearResults();
-      loadingState.classList.add("visible");
+    function clearProgressAnimation() {
+      if (progressFrame) {
+        cancelAnimationFrame(progressFrame);
+        progressFrame = null;
+      }
     }
 
-    function hideLoading() {
-      loadingState.classList.remove("visible");
+    function stopSpinner() {
+      if (spinnerInterval) {
+        clearInterval(spinnerInterval);
+        spinnerInterval = null;
+      }
+      if (stageInterval) {
+        clearInterval(stageInterval);
+        stageInterval = null;
+      }
     }
 
-    function showError(message) {
-      hideLoading();
-      statusError.textContent = message;
-      loadingState.classList.add("visible");
+    function resetResults() {
+      resultsShell.classList.remove("is-visible", "fade-in", "fade-out");
+      resultsShell.classList.add("is-hidden");
+      claimedProblemNode.textContent = "";
+      realProblemNode.textContent = "";
+      freeAlternativeNode.textContent = "";
+      verdictNode.textContent = "";
+      verdictContextNode.textContent = "";
+      oneLineSummaryNode.textContent = "";
+      keyInsightNode.textContent = "";
+      scoreFillNode.style.width = "0%";
+      scoreFillNode.style.background = "var(--accent)";
+      scoreNumberNode.textContent = "0 / 10";
+      realProblemNode.classList.remove("emphasis");
+      clearScoreAnimation();
     }
 
-    function setInteractiveState(isBusy) {
-      queryInput.disabled = isBusy;
-      submitButton.disabled = isBusy;
+    function showElement(element) {
+      element.classList.remove("is-hidden", "fade-out");
+      element.classList.add("is-visible", "fade-in");
+    }
+
+    async function hideElement(element) {
+      if (element.classList.contains("is-hidden")) return;
+      element.classList.remove("fade-in");
+      element.classList.add("fade-out");
+      await wait(300);
+      element.classList.remove("is-visible", "fade-out");
+      element.classList.add("is-hidden");
+    }
+
+    function renderAnalysisAscii(progress) {
+      const spinner = SPINNER_CHARS[spinnerIndex % SPINNER_CHARS.length];
+      const stage = ANALYSIS_STAGES[stageIndex % ANALYSIS_STAGES.length];
+      const filled = Math.round(progress / 5);
+      const bar = "█".repeat(Math.max(0, Math.min(20, filled))) + "░".repeat(Math.max(0, 20 - filled));
+      analysisAsciiNode.textContent = spinner + " " + stage + "\n\n[" + bar + "] " + String(Math.round(progress)).padStart(2, " ") + "%";
+    }
+
+    function startAnalysisAnimation(query) {
+      analysisToolNode.textContent = query.toUpperCase();
+      analysisTitleNode.textContent = "Analysis of " + query;
+      analysisErrorNode.textContent = "";
+      spinnerIndex = 0;
+      stageIndex = 0;
+      fakeProgress = 0;
+      renderAnalysisAscii(0);
+
+      stopSpinner();
+      clearProgressAnimation();
+
+      spinnerInterval = setInterval(() => {
+        spinnerIndex += 1;
+        renderAnalysisAscii(fakeProgress);
+      }, 80);
+
+      stageInterval = setInterval(() => {
+        stageIndex = (stageIndex + 1) % ANALYSIS_STAGES.length;
+        renderAnalysisAscii(fakeProgress);
+      }, 120);
+
+      const progressStart = performance.now();
+      const step = (now) => {
+        const elapsed = now - progressStart;
+        fakeProgress = Math.min(90, 90 * (1 - Math.exp(-elapsed / 1400)));
+        renderAnalysisAscii(fakeProgress);
+        if (fakeProgress < 90 && activeRequest) {
+          progressFrame = requestAnimationFrame(step);
+        }
+      };
+
+      progressFrame = requestAnimationFrame(step);
+    }
+
+    function completeAnalysisAnimation() {
+      fakeProgress = 100;
+      renderAnalysisAscii(fakeProgress);
+      stopSpinner();
+      clearProgressAnimation();
     }
 
     function animateScore(score, color) {
@@ -1064,10 +1168,7 @@
       const countDuration = 800;
       const fillDuration = 1000;
 
-      if (scoreFrame) {
-        cancelAnimationFrame(scoreFrame);
-      }
-
+      clearScoreAnimation();
       scoreFillNode.style.background = color;
 
       const tick = (now) => {
@@ -1100,6 +1201,7 @@
       verdictNode.style.color = verdictColor;
       verdictContextNode.textContent = verdictContextMap[payload.verdict] || verdictContextMap.Unclear;
       oneLineSummaryNode.textContent = payload.one_line_summary;
+      keyInsightNode.textContent = payload.key_insight || "";
 
       if (payload.real_problem.trim() !== payload.claimed_problem.trim()) {
         realProblemNode.classList.add("emphasis");
@@ -1107,35 +1209,47 @@
         realProblemNode.classList.remove("emphasis");
       }
 
-      hideLoading();
-      resultsShell.classList.remove("visible");
-      void resultsShell.offsetWidth;
-      resultsShell.classList.add("visible");
+      showElement(resultsShell);
       animateScore(payload.score, verdictColor);
+      resultsShell.scrollIntoView({ behavior: "smooth", block: "start" });
     }
 
-    function incrementCounter() {
-      const next = getCount() + 1;
-      setCount(next);
+    async function resetToHero() {
+      setInteractiveState(false);
+      stopSpinner();
+      clearProgressAnimation();
+      analysisErrorNode.textContent = "";
+      await hideElement(analysisScreen);
+      await hideElement(resultsShell);
+      resetResults();
+      queryInput.value = "";
+      showElement(heroSection);
+      queryInput.focus();
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
 
-    function hydrate() {
-      setCount(getCount());
-      renderHistory();
-    }
+    async function startAnalysis(rawQuery) {
+      if (activeRequest) return;
 
-    form.addEventListener("submit", async (event) => {
-      event.preventDefault();
-
-      const query = queryInput.value.trim();
+      const query = String(rawQuery || queryInput.value || "").trim();
       if (!query) {
-        showError("Enter a tool name or URL to analyze.");
         queryInput.focus();
         return;
       }
 
+      queryInput.value = query;
+      resetResults();
       setInteractiveState(true);
-      showLoading();
+
+      if (!heroSection.classList.contains("is-hidden")) {
+        await hideElement(heroSection);
+      }
+      if (!resultsShell.classList.contains("is-hidden")) {
+        await hideElement(resultsShell);
+      }
+
+      showElement(analysisScreen);
+      startAnalysisAnimation(query);
 
       try {
         const response = await fetch("/api/analyze", {
@@ -1151,36 +1265,42 @@
           throw new Error(payload && payload.error ? payload.error : "Analysis failed.");
         }
 
-        const requiredKeys = [
-          "claimed_problem",
-          "real_problem",
-          "free_alternative",
-          "verdict",
-          "score",
-          "one_line_summary"
-        ];
-
+        const requiredKeys = ["claimed_problem", "real_problem", "free_alternative", "verdict", "score", "one_line_summary", "key_insight"];
         const isValid = payload && requiredKeys.every((key) => Object.prototype.hasOwnProperty.call(payload, key));
         if (!isValid) {
           throw new Error("The analysis response was incomplete.");
         }
 
-        renderResults(payload);
         incrementCounter();
         rememberAnalysis(query);
-        queryInput.value = "";
+        completeAnalysisAnimation();
+        await wait(400);
+        await hideElement(analysisScreen);
+        renderResults(payload);
       } catch (error) {
-        showError(error instanceof Error ? error.message : "Something went wrong.");
+        completeAnalysisAnimation();
+        analysisErrorNode.textContent = error instanceof Error ? error.message : "Something went wrong.";
+        await wait(800);
+        await hideElement(analysisScreen);
+        showElement(heroSection);
+        queryInput.focus();
       } finally {
         setInteractiveState(false);
       }
+    }
+
+    function hydrate() {
+      setCount(getCount());
+      renderHistory();
+    }
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      await startAnalysis(queryInput.value);
     });
 
-    analyzeAgainButton.addEventListener("click", () => {
-      clearResults();
-      hideLoading();
-      queryInput.focus();
-      window.scrollTo({ top: 0, behavior: "smooth" });
+    analyzeAnotherTopButton.addEventListener("click", async () => {
+      await resetToHero();
     });
 
     clearHistoryButton.addEventListener("click", () => {
@@ -1192,3 +1312,6 @@
   </script>
 </body>
 </html>
+
+
+
