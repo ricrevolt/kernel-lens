@@ -462,12 +462,21 @@
     .analysis-ascii {
       margin: 32px auto 0;
       max-width: 500px;
-      min-height: 92px;
+      min-height: 42px;
       font-size: 13px;
       line-height: 1.7;
       color: var(--real);
       white-space: pre-wrap;
       text-align: center;
+    }
+
+    .cursor {
+      display: block;
+      margin-top: 16px;
+      font-family: "DM Mono", monospace;
+      font-size: 16px;
+      color: var(--real);
+      animation: blink 800ms ease-in-out infinite;
     }
 
     .analysis-title {
@@ -605,6 +614,18 @@
       color: var(--accent);
     }
 
+    .cost-value {
+      color: var(--unclear);
+    }
+
+    .better-if-value {
+      color: var(--real);
+    }
+
+    .avoid-if-value {
+      color: var(--wrapper);
+    }
+
     .footer {
       position: fixed;
       left: 0;
@@ -669,6 +690,11 @@
     @keyframes fadeOut {
       from { opacity: 1; }
       to { opacity: 0; }
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
     }
 
     @media (max-width: 1024px) {
@@ -822,6 +848,7 @@
         <div class="analysis-inner">
           <p class="analysis-tool" id="analysis-tool"></p>
           <pre class="analysis-ascii" id="analysis-ascii"></pre>
+          <span class="cursor" aria-hidden="true">_</span>
           <h2 class="analysis-title" id="analysis-title"></h2>
           <div class="analysis-error" id="analysis-error"></div>
         </div>
@@ -849,12 +876,22 @@
           </div>
 
           <div class="result-field" style="--delay: 360ms;">
+            <p class="results-label">Target Audience</p>
+            <p class="results-value" id="target-audience"></p>
+          </div>
+
+          <div class="result-field" style="--delay: 480ms;">
+            <p class="results-label">Real Cost</p>
+            <p class="results-value cost-value" id="real-cost"></p>
+          </div>
+
+          <div class="result-field" style="--delay: 600ms;">
             <p class="results-label">Verdict</p>
             <p class="verdict-value" id="verdict"></p>
             <p class="verdict-context" id="verdict-context"></p>
           </div>
 
-          <div class="result-field" style="--delay: 480ms;">
+          <div class="result-field" style="--delay: 720ms;">
             <p class="results-label">Problem-Solving Depth</p>
             <div class="score-row">
               <div class="score-track" aria-hidden="true">
@@ -864,14 +901,24 @@
             </div>
           </div>
 
-          <div class="result-field" style="--delay: 600ms;">
-            <p class="results-label">One-Line Summary</p>
-            <p class="results-value summary-value" id="one-line-summary"></p>
+          <div class="result-field" style="--delay: 840ms;">
+            <p class="results-label">Better If</p>
+            <p class="results-value better-if-value" id="better-if"></p>
           </div>
 
-          <div class="result-field" style="--delay: 720ms;">
+          <div class="result-field" style="--delay: 960ms;">
+            <p class="results-label">Avoid If</p>
+            <p class="results-value avoid-if-value" id="avoid-if"></p>
+          </div>
+
+          <div class="result-field" style="--delay: 1080ms;">
             <p class="results-label">Key Insight</p>
             <p class="results-value insight-value" id="key-insight"></p>
+          </div>
+
+          <div class="result-field" style="--delay: 1200ms;">
+            <p class="results-label">One-Line Summary</p>
+            <p class="results-value summary-value" id="one-line-summary"></p>
           </div>
         </div>
       </section>
@@ -927,22 +974,24 @@
     const claimedProblemNode = document.getElementById("claimed-problem");
     const realProblemNode = document.getElementById("real-problem");
     const freeAlternativeNode = document.getElementById("free-alternative");
+    const targetAudienceNode = document.getElementById("target-audience");
+    const realCostNode = document.getElementById("real-cost");
     const verdictNode = document.getElementById("verdict");
     const verdictContextNode = document.getElementById("verdict-context");
     const scoreFillNode = document.getElementById("score-fill");
     const scoreNumberNode = document.getElementById("score-number");
-    const oneLineSummaryNode = document.getElementById("one-line-summary");
+    const betterIfNode = document.getElementById("better-if");
+    const avoidIfNode = document.getElementById("avoid-if");
     const keyInsightNode = document.getElementById("key-insight");
+    const oneLineSummaryNode = document.getElementById("one-line-summary");
     const analyzeAnotherTopButton = document.getElementById("analyze-another-top");
 
     let scoreFrame = null;
     let spinnerInterval = null;
     let stageInterval = null;
-    let progressFrame = null;
     let activeRequest = false;
     let stageIndex = 0;
     let spinnerIndex = 0;
-    let fakeProgress = 0;
 
     function wait(ms) {
       return new Promise((resolve) => setTimeout(resolve, ms));
@@ -1063,13 +1112,6 @@
       }
     }
 
-    function clearProgressAnimation() {
-      if (progressFrame) {
-        cancelAnimationFrame(progressFrame);
-        progressFrame = null;
-      }
-    }
-
     function stopSpinner() {
       if (spinnerInterval) {
         clearInterval(spinnerInterval);
@@ -1087,10 +1129,14 @@
       claimedProblemNode.textContent = "";
       realProblemNode.textContent = "";
       freeAlternativeNode.textContent = "";
+      targetAudienceNode.textContent = "";
+      realCostNode.textContent = "";
       verdictNode.textContent = "";
       verdictContextNode.textContent = "";
-      oneLineSummaryNode.textContent = "";
+      betterIfNode.textContent = "";
+      avoidIfNode.textContent = "";
       keyInsightNode.textContent = "";
+      oneLineSummaryNode.textContent = "";
       scoreFillNode.style.width = "0%";
       scoreFillNode.style.background = "var(--accent)";
       scoreNumberNode.textContent = "0 / 10";
@@ -1112,12 +1158,10 @@
       element.classList.add("is-hidden");
     }
 
-    function renderAnalysisAscii(progress) {
+    function renderAnalysisAscii() {
       const spinner = SPINNER_CHARS[spinnerIndex % SPINNER_CHARS.length];
       const stage = ANALYSIS_STAGES[stageIndex % ANALYSIS_STAGES.length];
-      const filled = Math.round(progress / 5);
-      const bar = "█".repeat(Math.max(0, Math.min(20, filled))) + "░".repeat(Math.max(0, 20 - filled));
-      analysisAsciiNode.textContent = spinner + " " + stage + "\n\n[" + bar + "] " + String(Math.round(progress)).padStart(2, " ") + "%";
+      analysisAsciiNode.textContent = spinner + " " + stage;
     }
 
     function startAnalysisAnimation(query) {
@@ -1126,40 +1170,24 @@
       analysisErrorNode.textContent = "";
       spinnerIndex = 0;
       stageIndex = 0;
-      fakeProgress = 0;
-      renderAnalysisAscii(0);
+      renderAnalysisAscii();
 
       stopSpinner();
-      clearProgressAnimation();
 
       spinnerInterval = setInterval(() => {
         spinnerIndex += 1;
-        renderAnalysisAscii(fakeProgress);
+        renderAnalysisAscii();
       }, 80);
 
       stageInterval = setInterval(() => {
         stageIndex = (stageIndex + 1) % ANALYSIS_STAGES.length;
-        renderAnalysisAscii(fakeProgress);
+        renderAnalysisAscii();
       }, 120);
-
-      const progressStart = performance.now();
-      const step = (now) => {
-        const elapsed = now - progressStart;
-        fakeProgress = Math.min(90, 90 * (1 - Math.exp(-elapsed / 1400)));
-        renderAnalysisAscii(fakeProgress);
-        if (fakeProgress < 90 && activeRequest) {
-          progressFrame = requestAnimationFrame(step);
-        }
-      };
-
-      progressFrame = requestAnimationFrame(step);
     }
 
     function completeAnalysisAnimation() {
-      fakeProgress = 100;
-      renderAnalysisAscii(fakeProgress);
+      renderAnalysisAscii();
       stopSpinner();
-      clearProgressAnimation();
     }
 
     function animateScore(score, color) {
@@ -1197,11 +1225,15 @@
       claimedProblemNode.textContent = payload.claimed_problem;
       realProblemNode.textContent = payload.real_problem;
       freeAlternativeNode.textContent = payload.free_alternative;
+      targetAudienceNode.textContent = payload.target_audience;
+      realCostNode.textContent = payload.real_cost;
       verdictNode.textContent = payload.verdict;
       verdictNode.style.color = verdictColor;
       verdictContextNode.textContent = verdictContextMap[payload.verdict] || verdictContextMap.Unclear;
-      oneLineSummaryNode.textContent = payload.one_line_summary;
+      betterIfNode.textContent = payload.better_if;
+      avoidIfNode.textContent = payload.avoid_if;
       keyInsightNode.textContent = payload.key_insight || "";
+      oneLineSummaryNode.textContent = payload.one_line_summary;
 
       if (payload.real_problem.trim() !== payload.claimed_problem.trim()) {
         realProblemNode.classList.add("emphasis");
@@ -1217,7 +1249,6 @@
     async function resetToHero() {
       setInteractiveState(false);
       stopSpinner();
-      clearProgressAnimation();
       analysisErrorNode.textContent = "";
       await hideElement(analysisScreen);
       await hideElement(resultsShell);
@@ -1265,7 +1296,7 @@
           throw new Error(payload && payload.error ? payload.error : "Analysis failed.");
         }
 
-        const requiredKeys = ["claimed_problem", "real_problem", "free_alternative", "verdict", "score", "one_line_summary", "key_insight"];
+        const requiredKeys = ["claimed_problem", "real_problem", "free_alternative", "target_audience", "real_cost", "verdict", "score", "better_if", "avoid_if", "key_insight", "one_line_summary"];
         const isValid = payload && requiredKeys.every((key) => Object.prototype.hasOwnProperty.call(payload, key));
         if (!isValid) {
           throw new Error("The analysis response was incomplete.");
