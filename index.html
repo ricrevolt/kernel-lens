@@ -1,12 +1,12 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="dark">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Kernel Lens</title>
     <meta
       name="description"
-      content="Kernel Lens is a premium AI tool validator that cuts through hype with brutally honest verdicts."
+      content="Kernel Lens — AI tool validator. Brutally honest verdicts."
     />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -15,23 +15,41 @@
       rel="stylesheet"
     />
     <style>
+      /* ── THEME VARIABLES ── */
       :root {
         --bg: #000000;
+        --bg2: #0a0a0a;
         --text: #ffffff;
         --text-secondary: #999999;
+        --text-dim: #666666;
+        --text-muted: #444444;
         --accent: #e8e0d0;
         --line: #1a1a1a;
         --line-strong: #333333;
         --real: #4ae88a;
         --wrapper: #e84a4a;
         --unclear: #e8c84a;
-        --hover-bg: rgba(255, 255, 255, 0.06);
-        --sidebar-width: 220px;
-        --nav-height: 52px;
-        --footer-height: 40px;
-        --content-width: 640px;
-        --dim: #666666;
-        --muted-strong: #555555;
+        --hover-bg: rgba(255, 255, 255, 0.05);
+        --sidebar-w: 220px;
+        --nav-h: 52px;
+        --footer-h: 40px;
+        --content-w: 640px;
+      }
+
+      [data-theme="light"] {
+        --bg: #f8f6f2;
+        --bg2: #eeece8;
+        --text: #0a0a0a;
+        --text-secondary: #555555;
+        --text-dim: #888888;
+        --text-muted: #aaaaaa;
+        --accent: #3a3530;
+        --line: #e0ddd8;
+        --line-strong: #cccac5;
+        --real: #1a7a4a;
+        --wrapper: #c03030;
+        --unclear: #a07010;
+        --hover-bg: rgba(0, 0, 0, 0.04);
       }
 
       * {
@@ -45,28 +63,30 @@
         min-height: 100%;
         background: var(--bg);
         color: var(--text);
+        transition:
+          background 0.3s ease,
+          color 0.3s ease;
       }
 
       body {
         position: relative;
-        padding-top: var(--nav-height);
-        padding-bottom: var(--footer-height);
+        padding-top: var(--nav-h);
+        padding-bottom: var(--footer-h);
         overflow-x: hidden;
         font-family: "DM Sans", sans-serif;
       }
 
-      /* grain overlay */
       body::before {
         content: "";
         position: fixed;
         inset: 0;
         pointer-events: none;
-        opacity: 0.03;
-        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+        opacity: 0.025;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
         z-index: 0;
       }
 
-      /* top loading bar */
+      /* loading bar */
       #loading-bar {
         position: fixed;
         top: 0;
@@ -76,29 +96,26 @@
         background: var(--accent);
         z-index: 200;
         transition:
-          width 0.3s ease,
+          width 0.25s ease,
           opacity 0.4s ease;
         opacity: 0;
       }
-
       #loading-bar.active {
         opacity: 1;
       }
 
-      /* custom cursor */
+      /* cursor dot — desktop only */
       .cursor-dot {
         position: fixed;
-        width: 6px;
-        height: 6px;
+        width: 5px;
+        height: 5px;
         background: var(--accent);
         border-radius: 50%;
         pointer-events: none;
         z-index: 9999;
         transform: translate(-50%, -50%);
-        transition:
-          transform 0.1s ease,
-          opacity 0.3s ease;
         opacity: 0;
+        transition: opacity 0.3s ease;
       }
 
       a {
@@ -116,7 +133,7 @@
         top: 0;
         left: 0;
         right: 0;
-        height: var(--nav-height);
+        height: var(--nav-h);
         display: flex;
         align-items: center;
         justify-content: space-between;
@@ -124,6 +141,9 @@
         border-bottom: 1px solid var(--line);
         background: var(--bg);
         z-index: 100;
+        transition:
+          background 0.3s ease,
+          border-color 0.3s ease;
       }
 
       .nav-left,
@@ -132,7 +152,6 @@
         display: flex;
         align-items: center;
       }
-
       .nav-left,
       .nav-right {
         flex: 1;
@@ -143,7 +162,7 @@
       }
       .nav-right {
         justify-content: flex-end;
-        gap: 12px;
+        gap: 10px;
       }
 
       .brand {
@@ -161,13 +180,11 @@
         letter-spacing: 0.2em;
         color: var(--text-secondary);
         text-transform: uppercase;
-        transition: color 0.2s ease;
+        transition: color 0.2s;
       }
-
       .nav-link.active {
         color: var(--text);
       }
-
       .nav-link.active::after {
         content: "";
         position: absolute;
@@ -187,55 +204,74 @@
         background: transparent;
         color: var(--text);
         transition:
-          border-color 0.2s ease,
-          background-color 0.2s ease;
+          border-color 0.2s,
+          background 0.2s;
       }
-
       .github-button {
         padding: 6px 12px;
         font-family: "DM Mono", monospace;
         font-size: 11px;
         white-space: nowrap;
       }
-
       .github-icon {
         width: 31px;
         height: 31px;
       }
-
       .github-button:hover,
-      .github-button:focus-visible,
-      .github-icon:hover,
-      .github-icon:focus-visible {
+      .github-icon:hover {
         border-color: var(--text);
         background: var(--hover-bg);
-        outline: none;
+      }
+
+      /* theme toggle */
+      .theme-toggle {
+        width: 31px;
+        height: 31px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid var(--line-strong);
+        background: transparent;
+        color: var(--text);
+        cursor: pointer;
+        transition:
+          border-color 0.2s,
+          background 0.2s,
+          color 0.2s;
+        font-size: 13px;
+        padding: 0;
+      }
+      .theme-toggle:hover {
+        border-color: var(--text);
+        background: var(--hover-bg);
       }
 
       /* ── LAYOUT ── */
       .layout {
         position: relative;
         z-index: 1;
-        min-height: calc(100vh - var(--nav-height) - var(--footer-height));
+        min-height: calc(100vh - var(--nav-h) - var(--footer-h));
       }
 
       /* ── SIDEBAR ── */
       .sidebar {
         position: fixed;
-        top: var(--nav-height);
+        top: var(--nav-h);
         left: 0;
-        width: var(--sidebar-width);
-        height: calc(100vh - var(--nav-height));
-        padding: 24px 0 80px;
+        width: var(--sidebar-w);
+        height: calc(100vh - var(--nav-h));
+        display: flex;
+        flex-direction: column;
         border-right: 1px solid var(--line);
         background: var(--bg);
         z-index: 40;
-        display: flex;
-        flex-direction: column;
+        transition:
+          background 0.3s,
+          border-color 0.3s;
       }
 
       .sidebar-top {
-        padding: 0 16px;
+        padding: 24px 16px 12px;
         flex-shrink: 0;
       }
 
@@ -243,10 +279,10 @@
         font-family: "DM Mono", monospace;
         font-size: 10px;
         letter-spacing: 0.4em;
-        color: var(--dim);
+        color: var(--text-dim);
         text-transform: uppercase;
-        margin-bottom: 16px;
         display: block;
+        margin-bottom: 12px;
       }
 
       .history-list {
@@ -255,36 +291,32 @@
         overflow-x: hidden;
         scrollbar-width: none;
         -ms-overflow-style: none;
-        padding: 0 0 16px;
+        padding-bottom: 16px;
       }
-
       .history-list::-webkit-scrollbar {
         display: none;
       }
 
       .history-item {
         width: 100%;
-        padding: 10px 16px;
+        padding: 9px 16px;
         border: 0;
         border-left: 2px solid transparent;
         background: transparent;
-        color: var(--dim);
+        color: var(--text-dim);
         text-align: left;
         cursor: pointer;
         transition:
-          border-color 0.2s ease,
-          color 0.2s ease,
-          background-color 0.2s ease;
+          border-color 0.15s,
+          color 0.15s,
+          background 0.15s;
         display: block;
         min-width: 0;
       }
-
-      .history-item:hover,
-      .history-item:focus-visible {
+      .history-item:hover {
         border-left-color: var(--accent);
         color: var(--text);
-        background: rgba(255, 255, 255, 0.02);
-        outline: none;
+        background: var(--hover-bg);
       }
 
       .history-name {
@@ -296,58 +328,51 @@
         font-size: 13px;
         line-height: 1.4;
         min-width: 0;
-        max-width: 100%;
       }
-
       .history-time {
         display: block;
-        margin-top: 3px;
+        margin-top: 2px;
         font-family: "DM Mono", monospace;
         font-size: 10px;
-        color: var(--dim);
-        letter-spacing: 0.04em;
+        color: var(--text-muted);
       }
 
       .empty-history {
         font-family: "DM Mono", monospace;
         font-size: 11px;
-        color: var(--muted-strong);
+        color: var(--text-muted);
         padding: 0 16px;
       }
 
       .sidebar-footer {
-        padding: 16px 16px 0;
+        padding: 12px 16px;
         border-top: 1px solid var(--line);
         flex-shrink: 0;
       }
-
       .clear-history {
         font-family: "DM Mono", monospace;
         padding: 0;
         border: 0;
         background: transparent;
-        color: var(--muted-strong);
+        color: var(--text-muted);
         font-size: 10px;
         cursor: pointer;
-        transition: color 0.2s ease;
-        letter-spacing: 0.04em;
+        letter-spacing: 0.06em;
+        transition: color 0.2s;
       }
-
-      .clear-history:hover,
-      .clear-history:focus-visible {
+      .clear-history:hover {
         color: var(--text);
-        outline: none;
       }
 
       /* ── MAIN ── */
       .main {
-        margin-left: var(--sidebar-width);
+        margin-left: var(--sidebar-w);
         padding: 0 48px;
       }
 
       /* ── HERO ── */
       .hero {
-        min-height: calc(100vh - var(--nav-height) - var(--footer-height));
+        min-height: calc(100vh - var(--nav-h) - var(--footer-h));
         display: flex;
         align-items: center;
         justify-content: center;
@@ -359,7 +384,6 @@
       .results-shell.is-hidden {
         display: none;
       }
-
       .hero.is-visible {
         display: flex;
       }
@@ -375,7 +399,6 @@
       .results-shell.fade-out {
         animation: fadeOut 0.3s ease forwards;
       }
-
       .hero.fade-in,
       .analysis-screen.fade-in,
       .results-shell.fade-in {
@@ -386,7 +409,7 @@
       .results-block,
       .analysis-inner {
         width: 100%;
-        max-width: var(--content-width);
+        max-width: var(--content-w);
         margin: 0 auto;
       }
 
@@ -396,28 +419,24 @@
         letter-spacing: 0.4em;
         color: var(--text-secondary);
         text-transform: uppercase;
-        margin-bottom: 18px;
         display: block;
+        margin-bottom: 18px;
       }
 
-      /* scramble title */
       .hero-title {
         font-size: 72px;
         line-height: 0.95;
         font-weight: 300;
         letter-spacing: -0.04em;
         color: var(--text);
-        margin-bottom: 0;
-        min-height: 1.1em;
+        min-height: 1.05em;
       }
 
-      .hero-title .scramble-char {
+      .scramble-char {
         display: inline-block;
         color: var(--text);
-        transition: color 0.1s ease;
       }
-
-      .hero-title .scramble-char.resolving {
+      .scramble-char.resolving {
         color: var(--accent);
       }
 
@@ -430,11 +449,11 @@
 
       .hero-counter {
         font-family: "DM Mono", monospace;
-        margin-top: 18px;
+        display: block;
+        margin-top: 16px;
         font-size: 11px;
         letter-spacing: 0.08em;
-        color: var(--muted-strong);
-        display: block;
+        color: var(--text-muted);
       }
 
       .hero-form {
@@ -458,17 +477,15 @@
         font-size: 16px;
         outline: none;
         caret-color: var(--accent);
-        transition: border-bottom-color 0.3s ease;
+        transition: border-color 0.3s;
       }
-
       .hero-input::placeholder {
-        color: var(--muted-strong);
+        color: var(--text-muted);
       }
       .hero-input:focus {
-        border-bottom-color: var(--accent);
+        border-bottom-color: var(--text-secondary);
       }
 
-      /* animated underline pulse on focus */
       .input-line {
         position: absolute;
         bottom: 0;
@@ -479,23 +496,22 @@
         transition: width 0.4s ease;
         pointer-events: none;
       }
-
       .hero-input:focus ~ .input-line {
         width: 100%;
       }
 
       .hero-hint {
         font-family: "DM Mono", monospace;
-        margin-top: 12px;
+        display: block;
+        margin-top: 10px;
         font-size: 10px;
         letter-spacing: 0.3em;
-        color: var(--muted-strong);
+        color: var(--text-muted);
         text-transform: uppercase;
-        display: block;
       }
 
       .hero-actions {
-        margin-top: 24px;
+        margin-top: 20px;
       }
 
       .hero-submit {
@@ -508,26 +524,22 @@
         letter-spacing: 0.3em;
         text-transform: uppercase;
         cursor: pointer;
-        transition: color 0.2s ease;
+        transition: color 0.2s;
       }
-
-      .hero-submit:hover,
-      .hero-submit:focus-visible {
+      .hero-submit:hover {
         color: var(--accent);
-        outline: none;
       }
       .hero-submit:disabled {
-        color: var(--muted-strong);
+        color: var(--text-muted);
         cursor: wait;
       }
 
-      /* stagger intro */
+      /* intro stagger */
       .intro-item {
         opacity: 0;
         transform: translateY(12px);
         animation: introFadeUp 0.6s ease-out forwards;
       }
-
       .delay-0 {
         animation-delay: 0ms;
       }
@@ -553,55 +565,66 @@
       /* ── ANALYSIS SCREEN ── */
       .analysis-screen {
         display: none;
-        min-height: calc(100vh - var(--nav-height) - var(--footer-height));
+        min-height: calc(100vh - var(--nav-h) - var(--footer-h));
         align-items: center;
         justify-content: center;
-        padding: 48px 0 96px;
+        padding: 48px 0;
         text-align: center;
       }
 
       .analysis-tool {
         font-family: "DM Mono", monospace;
         font-size: 11px;
-        letter-spacing: 0.3em;
-        color: var(--dim);
+        letter-spacing: 0.4em;
+        color: var(--text-dim);
         text-transform: uppercase;
         display: block;
-        margin-bottom: 32px;
+        margin-bottom: 40px;
       }
 
-      .analysis-ascii {
-        font-family: "DM Mono", monospace;
-        font-size: 13px;
-        line-height: 1.7;
-        color: var(--real);
-        white-space: pre-wrap;
-        text-align: center;
-        margin: 0 auto;
-        max-width: 500px;
-        min-height: 24px;
-      }
-
-      .cursor-blink {
-        display: block;
-        margin-top: 20px;
+      /* Premium ASCII terminal block */
+      .ascii-terminal {
         font-family: "DM Mono", monospace;
         font-size: 14px;
+        line-height: 1.8;
+        color: var(--text);
+        white-space: pre;
+        text-align: left;
+        display: inline-block;
+        min-width: 380px;
+        max-width: 480px;
+      }
+
+      .ascii-terminal .line-dim {
+        color: var(--text-dim);
+      }
+      .ascii-terminal .line-accent {
         color: var(--accent);
-        animation: blink 900ms ease-in-out infinite;
-        letter-spacing: 0.2em;
+      }
+      .ascii-terminal .line-spinner {
+        color: var(--text);
+      }
+
+      .blink-cursor {
+        display: inline-block;
+        width: 8px;
+        height: 14px;
+        background: var(--text);
+        vertical-align: middle;
+        margin-left: 2px;
+        animation: blink 700ms step-end infinite;
       }
 
       .analysis-title {
-        margin-top: 28px;
-        font-size: 28px;
-        line-height: 1.2;
+        margin-top: 36px;
+        font-size: 22px;
         font-weight: 300;
         color: var(--text-secondary);
+        font-family: "DM Sans", sans-serif;
       }
 
       .analysis-error {
-        margin-top: 18px;
+        margin-top: 16px;
         font-family: "DM Mono", monospace;
         font-size: 12px;
         color: var(--wrapper);
@@ -611,41 +634,17 @@
       /* ── RESULTS ── */
       .results-shell {
         display: none;
-        padding: 40px 0 96px;
-      }
-
-      .results-header {
-        margin-bottom: 32px;
-      }
-
-      .analyze-another-top {
-        font-family: "DM Mono", monospace;
-        padding: 0;
-        border: 0;
-        background: transparent;
-        color: var(--muted-strong);
-        font-size: 11px;
-        letter-spacing: 0.06em;
-        cursor: pointer;
-        transition: color 0.2s ease;
-      }
-
-      .analyze-another-top:hover,
-      .analyze-another-top:focus-visible {
-        color: var(--text);
-        outline: none;
+        padding: 48px 0 80px;
       }
 
       .result-field {
         opacity: 0;
-        transform: translateY(12px);
+        transform: translateY(10px);
       }
-
       .results-shell.is-visible .result-field {
         animation: fadeInField 0.5s ease forwards;
         animation-delay: var(--delay, 0ms);
       }
-
       .result-field + .result-field {
         margin-top: 32px;
       }
@@ -654,17 +653,16 @@
         font-family: "DM Mono", monospace;
         font-size: 10px;
         letter-spacing: 0.4em;
-        color: var(--dim);
+        color: var(--text-dim);
         text-transform: uppercase;
-        margin-bottom: 10px;
         display: block;
+        margin-bottom: 10px;
       }
 
       .results-value {
         font-size: 16px;
-        line-height: 1.6;
+        line-height: 1.65;
         color: var(--text);
-        font-weight: 400;
         display: block;
       }
 
@@ -674,7 +672,7 @@
       }
 
       .verdict-value {
-        font-size: 32px;
+        font-size: 36px;
         line-height: 1.1;
         font-weight: 300;
         display: block;
@@ -682,43 +680,36 @@
 
       .verdict-context {
         font-family: "DM Mono", monospace;
-        margin-top: 10px;
-        font-size: 11px;
-        color: var(--dim);
-        letter-spacing: 0.06em;
-        text-transform: lowercase;
         display: block;
+        margin-top: 8px;
+        font-size: 11px;
+        color: var(--text-dim);
+        letter-spacing: 0.06em;
       }
 
       .score-row {
         display: flex;
         align-items: center;
-        gap: 18px;
+        gap: 16px;
       }
-
       .score-track {
         position: relative;
         flex: 1;
         height: 1px;
-        background: var(--line);
-        overflow: visible;
+        background: var(--line-strong);
         min-width: 0;
+        overflow: visible;
       }
-
       .score-fill {
         position: absolute;
         top: 0;
         left: 0;
         height: 100%;
         width: 0;
-        background: var(--accent);
-        transition: box-shadow 0.3s ease;
       }
-
       .score-fill.glow {
-        box-shadow: 0 0 8px 1px currentColor;
+        box-shadow: 0 0 6px 1px currentColor;
       }
-
       .score-number {
         font-family: "DM Mono", monospace;
         font-size: 14px;
@@ -733,18 +724,43 @@
         color: var(--text-secondary);
         font-style: italic;
       }
-
       .insight-value {
         color: var(--accent);
+        font-size: 15px;
+        line-height: 1.7;
       }
       .cost-value {
         color: var(--unclear);
       }
-      .better-if-value {
-        color: var(--real);
+
+      /* Analyze another — BOTTOM, visible */
+      .analyze-another-bottom {
+        margin-top: 56px;
+        padding-top: 32px;
+        border-top: 1px solid var(--line);
+        display: flex;
+        align-items: center;
+        gap: 16px;
       }
-      .avoid-if-value {
-        color: var(--wrapper);
+
+      .analyze-another-btn {
+        font-family: "DM Mono", monospace;
+        font-size: 13px;
+        letter-spacing: 0.2em;
+        padding: 10px 20px;
+        border: 1px solid var(--line-strong);
+        background: transparent;
+        color: var(--text);
+        cursor: pointer;
+        transition:
+          border-color 0.2s,
+          background 0.2s,
+          color 0.2s;
+        text-transform: uppercase;
+      }
+      .analyze-another-btn:hover {
+        border-color: var(--text);
+        background: var(--hover-bg);
       }
 
       /* ── FOOTER ── */
@@ -753,7 +769,7 @@
         left: 0;
         right: 0;
         bottom: 0;
-        height: var(--footer-height);
+        height: var(--footer-h);
         display: flex;
         align-items: center;
         justify-content: space-between;
@@ -761,6 +777,9 @@
         border-top: 1px solid var(--line);
         background: var(--bg);
         z-index: 50;
+        transition:
+          background 0.3s,
+          border-color 0.3s;
       }
 
       .footer-copy {
@@ -774,13 +793,10 @@
 
       .footer-link {
         color: var(--text-secondary);
-        transition: color 0.2s ease;
+        transition: color 0.2s;
       }
-
-      .footer-link:hover,
-      .footer-link:focus-visible {
+      .footer-link:hover {
         color: var(--text);
-        outline: none;
       }
 
       /* ── KEYFRAMES ── */
@@ -794,18 +810,16 @@
           transform: translateY(0);
         }
       }
-
       @keyframes fadeInField {
         from {
           opacity: 0;
-          transform: translateY(12px);
+          transform: translateY(10px);
         }
         to {
           opacity: 1;
           transform: translateY(0);
         }
       }
-
       @keyframes fadeIn {
         from {
           opacity: 0;
@@ -814,7 +828,6 @@
           opacity: 1;
         }
       }
-
       @keyframes fadeOut {
         from {
           opacity: 1;
@@ -823,7 +836,6 @@
           opacity: 0;
         }
       }
-
       @keyframes blink {
         0%,
         100% {
@@ -840,69 +852,57 @@
           position: static;
           width: 100%;
           height: auto;
-          border-right: 0;
-          border-bottom: 1px solid var(--line);
           flex-direction: row;
           flex-wrap: wrap;
-          padding: 16px 16px 12px;
-          gap: 0;
+          border-right: 0;
+          border-bottom: 1px solid var(--line);
+          padding: 12px 16px;
         }
-
         .sidebar-top {
-          padding: 0;
           width: 100%;
+          padding: 0 0 8px;
         }
-
         .history-list {
           display: flex;
           flex-direction: row;
-          flex-wrap: nowrap;
           overflow-x: auto;
           overflow-y: visible;
           gap: 4px;
-          padding: 8px 0 4px;
+          padding: 4px 0;
           width: 100%;
         }
-
         .history-item {
           flex-shrink: 0;
           width: auto;
           max-width: 140px;
           border-left: 0;
           border-bottom: 1px solid transparent;
-          padding: 6px 10px;
-          white-space: nowrap;
+          padding: 5px 10px;
         }
-
         .history-item:hover {
           border-left-color: transparent;
           border-bottom-color: var(--accent);
         }
-
         .history-name {
           font-size: 12px;
         }
         .history-time {
           display: none;
         }
-
         .sidebar-footer {
           border-top: 0;
           padding: 4px 0 0;
           width: 100%;
         }
-
         .main {
           margin-left: 0;
           padding: 0 24px;
         }
-
         .hero,
         .analysis-screen {
           min-height: auto;
           padding: 56px 0 48px;
         }
-
         .results-shell {
           padding-bottom: 64px;
         }
@@ -918,19 +918,18 @@
         .main {
           padding: 0 20px;
         }
-
         .hero-title {
           font-size: 52px;
         }
-
         .footer {
           padding: 0 16px;
         }
         .footer-copy.center-copy {
           display: none;
         }
-        .analysis-title {
-          font-size: 22px;
+        .ascii-terminal {
+          font-size: 12px;
+          min-width: 300px;
         }
       }
 
@@ -942,9 +941,8 @@
           display: none;
         }
         .hero-title {
-          font-size: 38px;
+          font-size: 36px;
         }
-
         .score-row {
           flex-direction: column;
           align-items: flex-start;
@@ -952,7 +950,11 @@
         .score-track {
           width: 100%;
         }
-
+        .ascii-terminal {
+          min-width: unset;
+          width: 100%;
+          font-size: 11px;
+        }
         .footer {
           position: static;
           height: auto;
@@ -960,7 +962,6 @@
           gap: 6px;
           padding: 12px 16px 16px;
         }
-
         .footer-copy {
           white-space: normal;
           text-align: center;
@@ -968,14 +969,15 @@
         .cursor-dot {
           display: none;
         }
+        .analyze-another-bottom {
+          flex-direction: column;
+          align-items: flex-start;
+        }
       }
     </style>
   </head>
   <body>
-    <!-- Loading bar -->
     <div id="loading-bar"></div>
-
-    <!-- Custom cursor dot -->
     <div class="cursor-dot" id="cursor-dot"></div>
 
     <header class="navbar">
@@ -987,6 +989,14 @@
         <a class="nav-link" href="/about.html">About</a>
       </nav>
       <div class="nav-right">
+        <button
+          class="theme-toggle"
+          id="theme-toggle"
+          title="Toggle theme"
+          aria-label="Toggle light/dark mode"
+        >
+          <span id="theme-icon">○</span>
+        </button>
         <a
           class="github-button"
           href="https://github.com/ricrevolt/kernel-lens"
@@ -999,15 +1009,9 @@
           href="https://github.com/ricrevolt/kernel-lens"
           target="_blank"
           rel="noreferrer"
-          aria-label="Kernel Lens on GitHub"
+          aria-label="GitHub"
         >
-          <svg
-            width="14"
-            height="14"
-            viewBox="0 0 16 16"
-            fill="none"
-            aria-hidden="true"
-          >
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
             <path
               d="M8 1C4.134 1 1 4.134 1 8c0 3.094 2.005 5.718 4.787 6.644.35.064.478-.152.478-.338 0-.167-.006-.61-.01-1.197-1.946.423-2.357-.938-2.357-.938-.318-.808-.777-1.024-.777-1.024-.636-.434.048-.425.048-.425.703.049 1.073.722 1.073.722.625 1.07 1.64.761 2.04.582.063-.453.244-.762.444-.937-1.554-.177-3.188-.777-3.188-3.459 0-.764.273-1.388.721-1.877-.072-.177-.312-.889.069-1.853 0 0 .588-.188 1.926.717A6.69 6.69 0 0 1 8 4.406c.595.003 1.194.08 1.754.235 1.337-.905 1.924-.717 1.924-.717.383.964.143 1.676.07 1.853.449.489.72 1.113.72 1.877 0 2.688-1.637 3.28-3.197 3.454.251.216.475.643.475 1.296 0 .935-.008 1.689-.008 1.919 0 .188.126.406.482.337C12.997 13.715 15 11.093 15 8c0-3.866-3.134-7-7-7Z"
               fill="currentColor"
@@ -1088,9 +1092,8 @@
           aria-live="polite"
         >
           <div class="analysis-inner">
-            <span class="analysis-tool" id="analysis-tool"></span>
-            <pre class="analysis-ascii" id="analysis-ascii"></pre>
-            <span class="cursor-blink" aria-hidden="true">· · ·</span>
+            <span class="analysis-tool" id="analysis-tool-label"></span>
+            <div class="ascii-terminal" id="ascii-terminal"></div>
             <h2 class="analysis-title" id="analysis-title"></h2>
             <div class="analysis-error" id="analysis-error"></div>
           </div>
@@ -1103,16 +1106,6 @@
           aria-live="polite"
         >
           <div class="results-block">
-            <div class="results-header">
-              <button
-                class="analyze-another-top"
-                id="analyze-another-top"
-                type="button"
-              >
-                ← Analyze another tool
-              </button>
-            </div>
-
             <div class="result-field" style="--delay: 0ms">
               <span class="results-label">Claimed Problem</span>
               <span class="results-value" id="claimed-problem"></span>
@@ -1147,7 +1140,7 @@
             <div class="result-field" style="--delay: 720ms">
               <span class="results-label">Problem-Solving Depth</span>
               <div class="score-row">
-                <div class="score-track" aria-hidden="true">
+                <div class="score-track">
                   <div class="score-fill" id="score-fill"></div>
                 </div>
                 <span class="score-number" id="score-number">0 / 10</span>
@@ -1155,26 +1148,27 @@
             </div>
 
             <div class="result-field" style="--delay: 840ms">
-              <span class="results-label">Better If</span>
-              <span class="results-value better-if-value" id="better-if"></span>
-            </div>
-
-            <div class="result-field" style="--delay: 960ms">
-              <span class="results-label">Avoid If</span>
-              <span class="results-value avoid-if-value" id="avoid-if"></span>
-            </div>
-
-            <div class="result-field" style="--delay: 1080ms">
               <span class="results-label">Key Insight</span>
               <span class="results-value insight-value" id="key-insight"></span>
             </div>
 
-            <div class="result-field" style="--delay: 1200ms">
+            <div class="result-field" style="--delay: 960ms">
               <span class="results-label">One-Line Summary</span>
               <span
                 class="results-value summary-value"
                 id="one-line-summary"
               ></span>
+            </div>
+
+            <!-- ANALYZE ANOTHER — bottom, visible -->
+            <div class="analyze-another-bottom">
+              <button
+                class="analyze-another-btn"
+                id="analyze-another-btn"
+                type="button"
+              >
+                ← Analyze Another Tool
+              </button>
             </div>
           </div>
         </section>
@@ -1201,42 +1195,36 @@
     <script>
       (() => {
         /* ── CONSTANTS ── */
-        const COUNTER_KEY = "kernelLensAnalysisCount";
+        const COUNTER_KEY = "kernelLensCount";
         const HISTORY_KEY = "kernelLensHistory";
+        const THEME_KEY = "kernelLensTheme";
         const DEFAULT_COUNT = 2847;
         const MAX_HISTORY = 10;
+        const SCRAMBLE_POOL =
+          "!<>-_\\/[]{}=+*^?#@ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
-        const SPINNER_CHARS = [
-          "⠋",
-          "⠙",
-          "⠹",
-          "⠸",
-          "⠼",
-          "⠴",
-          "⠦",
-          "⠧",
-          "⠇",
-          "⠏",
-        ];
-        const ANALYSIS_STAGES = [
-          "scanning product surface...",
-          "extracting core claims...",
-          "identifying real problem...",
-          "checking free alternatives...",
-          "calculating verdict...",
-          "finalizing analysis...",
-        ];
+        const SPINNER = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"];
 
-        const SCRAMBLE_CHARS =
-          "!<>-_\\/[]{}—=+*^?#ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        const TERMINAL_LINES = [
+          { text: "KERNEL LENS // ANALYSIS ENGINE v2.1", cls: "line-accent" },
+          { text: "─────────────────────────────────────", cls: "line-dim" },
+          { text: "INITIALIZING SCAN PROTOCOL...", cls: "" },
+          { text: "LOADING MARKET DATABASE...", cls: "line-dim" },
+          { text: "EXTRACTING CORE CLAIMS...", cls: "" },
+          { text: "CROSS-REFERENCING TECH STACK...", cls: "line-dim" },
+          { text: "IDENTIFYING REAL PROBLEM...", cls: "" },
+          { text: "CHECKING FREE ALTERNATIVES...", cls: "line-dim" },
+          { text: "CALCULATING VERDICT...", cls: "" },
+          { text: "RUNNING FINAL VALIDATION...", cls: "line-dim" },
+        ];
 
         const verdictColors = {
-          "Real Solution": "#4AE88A",
-          "Expensive Wrapper": "#E84A4A",
-          Unclear: "#E8C84A",
+          "Real Solution": "var(--real)",
+          "Expensive Wrapper": "var(--wrapper)",
+          Unclear: "var(--unclear)",
         };
 
-        const verdictContextMap = {
+        const verdictCtx = {
           "Real Solution": "worth your money",
           "Expensive Wrapper": "save your subscription",
           Unclear: "needs more research",
@@ -1245,123 +1233,127 @@
         /* ── ELEMENTS ── */
         const form = document.getElementById("analyzer-form");
         const queryInput = document.getElementById("query");
-        const submitButton = document.getElementById("submit-button");
+        const submitBtn = document.getElementById("submit-button");
         const counterNode = document.getElementById("analysis-counter");
         const historyList = document.getElementById("history-list");
-        const clearHistoryButton = document.getElementById("clear-history");
+        const clearHistBtn = document.getElementById("clear-history");
         const heroSection = document.getElementById("hero-section");
         const analysisScreen = document.getElementById("analysis-screen");
-        const analysisToolNode = document.getElementById("analysis-tool");
-        const analysisAsciiNode = document.getElementById("analysis-ascii");
-        const analysisTitleNode = document.getElementById("analysis-title");
-        const analysisErrorNode = document.getElementById("analysis-error");
+        const analysisToolLbl = document.getElementById("analysis-tool-label");
+        const asciiTerminal = document.getElementById("ascii-terminal");
+        const analysisTitleEl = document.getElementById("analysis-title");
+        const analysisErrorEl = document.getElementById("analysis-error");
         const resultsShell = document.getElementById("results-shell");
-        const claimedProblemNode = document.getElementById("claimed-problem");
-        const realProblemNode = document.getElementById("real-problem");
-        const freeAltNode = document.getElementById("free-alternative");
-        const targetAudNode = document.getElementById("target-audience");
-        const realCostNode = document.getElementById("real-cost");
-        const verdictNode = document.getElementById("verdict");
-        const verdictCtxNode = document.getElementById("verdict-context");
-        const scoreFillNode = document.getElementById("score-fill");
-        const scoreNumberNode = document.getElementById("score-number");
-        const betterIfNode = document.getElementById("better-if");
-        const avoidIfNode = document.getElementById("avoid-if");
-        const keyInsightNode = document.getElementById("key-insight");
-        const summaryNode = document.getElementById("one-line-summary");
+        const claimedEl = document.getElementById("claimed-problem");
+        const realProbEl = document.getElementById("real-problem");
+        const freeAltEl = document.getElementById("free-alternative");
+        const targetAudEl = document.getElementById("target-audience");
+        const realCostEl = document.getElementById("real-cost");
+        const verdictEl = document.getElementById("verdict");
+        const verdictCtxEl = document.getElementById("verdict-context");
+        const scoreFillEl = document.getElementById("score-fill");
+        const scoreNumEl = document.getElementById("score-number");
+        const keyInsightEl = document.getElementById("key-insight");
+        const summaryEl = document.getElementById("one-line-summary");
         const analyzeAnotherBtn = document.getElementById(
-          "analyze-another-top",
+          "analyze-another-btn",
         );
         const loadingBar = document.getElementById("loading-bar");
         const cursorDot = document.getElementById("cursor-dot");
         const heroTitleEl = document.getElementById("hero-title-el");
+        const themeToggle = document.getElementById("theme-toggle");
+        const themeIcon = document.getElementById("theme-icon");
 
         /* ── STATE ── */
-        let scoreFrame = null;
-        let spinnerInt = null;
-        let stageInt = null;
         let activeRequest = false;
-        let stageIndex = 0;
-        let spinnerIndex = 0;
+        let scoreFrame = null;
         let scrambleFrame = null;
-        let loadingProgress = 0;
+        let terminalInt = null;
         let loadingInt = null;
+        let loadingPct = 0;
+
+        /* ── THEME ── */
+        const savedTheme = localStorage.getItem(THEME_KEY) || "dark";
+        applyTheme(savedTheme);
+
+        function applyTheme(t) {
+          document.documentElement.setAttribute("data-theme", t);
+          themeIcon.textContent = t === "dark" ? "○" : "●";
+          localStorage.setItem(THEME_KEY, t);
+        }
+
+        themeToggle.addEventListener("click", () => {
+          const current = document.documentElement.getAttribute("data-theme");
+          applyTheme(current === "dark" ? "light" : "dark");
+        });
 
         /* ── CURSOR DOT ── */
-        let mouseX = 0,
-          mouseY = 0;
         document.addEventListener("mousemove", (e) => {
-          mouseX = e.clientX;
-          mouseY = e.clientY;
           cursorDot.style.opacity = "1";
-          cursorDot.style.left = mouseX + "px";
-          cursorDot.style.top = mouseY + "px";
+          cursorDot.style.left = e.clientX + "px";
+          cursorDot.style.top = e.clientY + "px";
         });
         document.addEventListener("mouseleave", () => {
           cursorDot.style.opacity = "0";
         });
 
-        /* ── TEXT SCRAMBLE ── */
-        function scrambleText(el, finalText, duration = 1200) {
-          const chars = finalText.split("");
-          const totalFrames = Math.round(duration / 40);
+        /* ── SCRAMBLE ── */
+        function scrambleText(el, final, duration = 1200) {
+          const chars = final.split("");
+          const total = Math.round(duration / 40);
           let frame = 0;
 
-          // build spans
+          const nonSpace = chars.filter((c) => c !== " ");
           el.innerHTML = chars
-            .map((ch, i) =>
-              ch === " "
+            .map((c, i) =>
+              c === " "
                 ? " "
-                : `<span class="scramble-char" data-index="${i}">${ch}</span>`,
+                : `<span class="scramble-char" data-i="${i}"></span>`,
             )
             .join("");
 
           const spans = Array.from(el.querySelectorAll(".scramble-char"));
           const resolveAt = spans.map((_, i) =>
-            Math.floor((i / spans.length) * totalFrames * 0.7),
+            Math.floor((i / spans.length) * total * 0.65),
           );
 
           if (scrambleFrame) cancelAnimationFrame(scrambleFrame);
 
           const tick = () => {
-            spans.forEach((span, i) => {
+            spans.forEach((sp, i) => {
               if (frame >= resolveAt[i]) {
-                span.textContent =
-                  chars.filter((c) => c !== " ")[i] || chars[i];
-                span.classList.remove("resolving");
+                sp.textContent = nonSpace[i] || chars[i];
+                sp.classList.remove("resolving");
               } else {
-                span.textContent =
-                  SCRAMBLE_CHARS[
-                    Math.floor(Math.random() * SCRAMBLE_CHARS.length)
+                sp.textContent =
+                  SCRAMBLE_POOL[
+                    Math.floor(Math.random() * SCRAMBLE_POOL.length)
                   ];
-                span.classList.add("resolving");
+                sp.classList.add("resolving");
               }
             });
-
             frame++;
-            if (frame <= totalFrames) {
+            if (frame <= total) {
               scrambleFrame = requestAnimationFrame(tick);
             } else {
-              // ensure final state
-              el.textContent = finalText;
+              el.textContent = final;
             }
           };
-
           scrambleFrame = requestAnimationFrame(tick);
         }
 
         /* ── LOADING BAR ── */
-        function startLoadingBar() {
-          loadingProgress = 0;
+        function startLoading() {
+          loadingPct = 0;
           loadingBar.style.width = "0%";
           loadingBar.classList.add("active");
           loadingInt = setInterval(() => {
-            loadingProgress = Math.min(loadingProgress + Math.random() * 8, 88);
-            loadingBar.style.width = loadingProgress + "%";
-          }, 200);
+            loadingPct = Math.min(loadingPct + Math.random() * 7, 85);
+            loadingBar.style.width = loadingPct + "%";
+          }, 220);
         }
 
-        function finishLoadingBar() {
+        function finishLoading() {
           clearInterval(loadingInt);
           loadingBar.style.width = "100%";
           setTimeout(() => {
@@ -1370,25 +1362,96 @@
           }, 500);
         }
 
+        /* ── TERMINAL ANIMATION ── */
+        let termLineIdx = 0;
+        let termSpinner = 0;
+
+        function startTerminal(toolName) {
+          asciiTerminal.innerHTML = "";
+          termLineIdx = 0;
+          termSpinner = 0;
+
+          // header lines appear instantly
+          const header = document.createElement("div");
+          header.style.cssText = "margin-bottom:8px;";
+          header.innerHTML =
+            `<span style="color:var(--accent)">KERNEL LENS // ANALYSIS ENGINE v2.1</span>\n` +
+            `<span style="color:var(--text-dim)">─────────────────────────────────────</span>\n` +
+            `<span style="color:var(--text-dim)">TARGET: ${toolName.toUpperCase()}</span>\n` +
+            `<span style="color:var(--text-dim)">─────────────────────────────────────</span>\n`;
+          asciiTerminal.appendChild(header);
+
+          const linesContainer = document.createElement("div");
+          asciiTerminal.appendChild(linesContainer);
+
+          // spinner line
+          const spinnerLine = document.createElement("div");
+          linesContainer.appendChild(spinnerLine);
+
+          // cursor
+          const cursor = document.createElement("span");
+          cursor.className = "blink-cursor";
+          asciiTerminal.appendChild(cursor);
+
+          const stages = [
+            "INITIALIZING SCAN PROTOCOL",
+            "LOADING MARKET DATABASE",
+            "EXTRACTING CORE CLAIMS",
+            "CROSS-REFERENCING TECH STACK",
+            "IDENTIFYING REAL PROBLEM",
+            "CHECKING FREE ALTERNATIVES",
+            "CALCULATING VERDICT",
+            "RUNNING FINAL VALIDATION",
+            "COMPILING REPORT",
+          ];
+
+          let stageIdx = 0;
+          const completedLines = [];
+
+          if (terminalInt) clearInterval(terminalInt);
+
+          terminalInt = setInterval(() => {
+            termSpinner = (termSpinner + 1) % SPINNER.length;
+
+            // update spinner line
+            const s = SPINNER[termSpinner];
+            const stage = stages[stageIdx % stages.length];
+            spinnerLine.innerHTML = `<span style="color:var(--text)">${s} ${stage}...</span>`;
+
+            // every ~2 seconds complete a stage
+            if (termSpinner % 16 === 0 && stageIdx < stages.length - 1) {
+              const done = document.createElement("div");
+              done.innerHTML = `<span style="color:var(--text-dim)">✓ ${stages[stageIdx]}... DONE</span>`;
+              linesContainer.insertBefore(done, spinnerLine);
+              completedLines.push(done);
+              stageIdx++;
+            }
+          }, 80);
+        }
+
+        function stopTerminal() {
+          if (terminalInt) {
+            clearInterval(terminalInt);
+            terminalInt = null;
+          }
+        }
+
         /* ── UTILS ── */
         const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 
-        function formatCount(v) {
-          return new Intl.NumberFormat("en-US").format(v);
-        }
-
         function getCount() {
-          const s = parseInt(localStorage.getItem(COUNTER_KEY), 10);
-          return isFinite(s) ? s : DEFAULT_COUNT;
+          const v = parseInt(localStorage.getItem(COUNTER_KEY), 10);
+          return isFinite(v) ? v : DEFAULT_COUNT;
         }
 
         function setCount(v) {
           localStorage.setItem(COUNTER_KEY, String(v));
-          counterNode.textContent = formatCount(v) + " tools analyzed";
+          counterNode.textContent =
+            new Intl.NumberFormat("en-US").format(v) + " tools analyzed";
         }
 
-        function esc(v) {
-          return String(v).replace(
+        function esc(s) {
+          return String(s).replace(
             /[&<>"']/g,
             (c) =>
               ({
@@ -1418,15 +1481,11 @@
           );
         }
 
-        function trunc(v, n = 22) {
-          return v.length > n ? v.slice(0, n - 1) + "…" : v;
-        }
-
         function relTime(ts) {
           const d = Date.now() - ts;
-          const m = 60000,
-            h = 3600000,
-            dy = 86400000;
+          const m = 6e4,
+            h = 36e5,
+            dy = 864e5;
           if (d < m) return "just now";
           if (d < h) {
             const n = Math.max(1, Math.floor(d / m));
@@ -1443,7 +1502,6 @@
         function renderHistory() {
           const history = getHistory();
           historyList.innerHTML = "";
-
           if (!history.length) {
             const p = document.createElement("p");
             p.className = "empty-history";
@@ -1451,15 +1509,16 @@
             historyList.appendChild(p);
             return;
           }
-
           history.forEach((entry) => {
-            if (!entry || typeof entry.query !== "string") return;
+            if (!entry?.query) return;
             const btn = document.createElement("button");
             btn.type = "button";
             btn.className = "history-item";
-            btn.innerHTML =
-              `<span class="history-name">${esc(trunc(entry.query))}</span>` +
-              `<span class="history-time">${esc(relTime(entry.timestamp || Date.now()))}</span>`;
+            const name =
+              entry.query.length > 22
+                ? entry.query.slice(0, 21) + "…"
+                : entry.query;
+            btn.innerHTML = `<span class="history-name">${esc(name)}</span><span class="history-time">${esc(relTime(entry.timestamp || Date.now()))}</span>`;
             btn.addEventListener("click", () => {
               queryInput.value = entry.query;
               startAnalysis(entry.query);
@@ -1468,81 +1527,39 @@
           });
         }
 
-        function rememberAnalysis(query) {
+        function remember(query) {
           const q = query.trim();
           if (!q) return;
-          const existing = getHistory().filter((e) => e && e.query !== q);
+          const existing = getHistory().filter((e) => e?.query !== q);
           existing.unshift({ query: q, timestamp: Date.now() });
           saveHistory(existing);
           renderHistory();
         }
 
-        /* ── SPINNER ── */
-        function renderAscii() {
-          const s = SPINNER_CHARS[spinnerIndex % SPINNER_CHARS.length];
-          const stage = ANALYSIS_STAGES[stageIndex % ANALYSIS_STAGES.length];
-          analysisAsciiNode.textContent = s + " " + stage;
-        }
-
-        function startSpinner() {
-          spinnerIndex = 0;
-          stageIndex = 0;
-          renderAscii();
-          stopSpinner();
-          spinnerInt = setInterval(() => {
-            spinnerIndex++;
-            renderAscii();
-          }, 80);
-          stageInt = setInterval(() => {
-            stageIndex = (stageIndex + 1) % ANALYSIS_STAGES.length;
-            renderAscii();
-          }, 1800);
-        }
-
-        function stopSpinner() {
-          if (spinnerInt) {
-            clearInterval(spinnerInt);
-            spinnerInt = null;
-          }
-          if (stageInt) {
-            clearInterval(stageInt);
-            stageInt = null;
-          }
-        }
-
         /* ── SCORE ANIMATION ── */
-        function clearScoreAnim() {
-          if (scoreFrame) {
-            cancelAnimationFrame(scoreFrame);
-            scoreFrame = null;
-          }
-        }
-
         function animateScore(score, color) {
           const final = Math.max(1, Math.min(10, Number(score) || 1));
           const start = performance.now();
           const dur = 900;
-          clearScoreAnim();
-          scoreFillNode.style.background = color;
-          scoreFillNode.style.color = color;
+          if (scoreFrame) cancelAnimationFrame(scoreFrame);
+          scoreFillEl.style.background = color;
+          scoreFillEl.style.color = color;
 
           const tick = (now) => {
             const p = Math.min((now - start) / dur, 1);
-            const ease = 1 - Math.pow(1 - p, 3); // ease-out cubic
-            scoreNumberNode.textContent = Math.round(final * ease) + " / 10";
-            scoreFillNode.style.width = final * 10 * ease + "%";
-
+            const e = 1 - Math.pow(1 - p, 3);
+            scoreNumEl.textContent = Math.round(final * e) + " / 10";
+            scoreFillEl.style.width = final * 10 * e + "%";
             if (p < 1) {
               scoreFrame = requestAnimationFrame(tick);
             } else {
-              scoreNumberNode.textContent = final + " / 10";
-              scoreFillNode.style.width = final * 10 + "%";
-              scoreFillNode.classList.add("glow");
-              setTimeout(() => scoreFillNode.classList.remove("glow"), 1200);
+              scoreNumEl.textContent = final + " / 10";
+              scoreFillEl.style.width = final * 10 + "%";
+              scoreFillEl.classList.add("glow");
+              setTimeout(() => scoreFillEl.classList.remove("glow"), 1200);
               scoreFrame = null;
             }
           };
-
           scoreFrame = requestAnimationFrame(tick);
         }
 
@@ -1561,70 +1578,65 @@
           el.classList.add("is-hidden");
         }
 
-        /* ── RESET ── */
         function resetResults() {
           resultsShell.classList.remove("is-visible", "fade-in", "fade-out");
           resultsShell.classList.add("is-hidden");
           [
-            claimedProblemNode,
-            realProblemNode,
-            freeAltNode,
-            targetAudNode,
-            realCostNode,
-            verdictNode,
-            verdictCtxNode,
-            betterIfNode,
-            avoidIfNode,
-            keyInsightNode,
-            summaryNode,
+            claimedEl,
+            realProbEl,
+            freeAltEl,
+            targetAudEl,
+            realCostEl,
+            verdictEl,
+            verdictCtxEl,
+            keyInsightEl,
+            summaryEl,
           ].forEach((n) => {
             n.textContent = "";
+            if (n.style) n.style.color = "";
           });
-          scoreFillNode.style.width = "0%";
-          scoreFillNode.style.background = "var(--accent)";
-          scoreNumberNode.textContent = "0 / 10";
-          realProblemNode.classList.remove("emphasis");
-          clearScoreAnim();
+          scoreFillEl.style.width = "0%";
+          scoreNumEl.textContent = "0 / 10";
+          realProbEl.classList.remove("emphasis");
+          if (scoreFrame) {
+            cancelAnimationFrame(scoreFrame);
+            scoreFrame = null;
+          }
         }
 
         /* ── RENDER RESULTS ── */
-        function renderResults(payload) {
-          const color = verdictColors[payload.verdict] || verdictColors.Unclear;
+        function renderResults(p) {
+          const color = verdictColors[p.verdict] || verdictColors.Unclear;
+          claimedEl.textContent = p.claimed_problem;
+          realProbEl.textContent = p.real_problem;
+          freeAltEl.textContent = p.free_alternative;
+          targetAudEl.textContent = p.target_audience;
+          realCostEl.textContent = p.real_cost;
+          verdictEl.textContent = p.verdict;
+          verdictEl.style.color = color;
+          verdictCtxEl.textContent =
+            verdictCtx[p.verdict] || verdictCtx.Unclear;
+          keyInsightEl.textContent = p.key_insight || "";
+          summaryEl.textContent = p.one_line_summary;
 
-          claimedProblemNode.textContent = payload.claimed_problem;
-          realProblemNode.textContent = payload.real_problem;
-          freeAltNode.textContent = payload.free_alternative;
-          targetAudNode.textContent = payload.target_audience;
-          realCostNode.textContent = payload.real_cost;
-          verdictNode.textContent = payload.verdict;
-          verdictNode.style.color = color;
-          verdictCtxNode.textContent =
-            verdictContextMap[payload.verdict] || verdictContextMap.Unclear;
-          betterIfNode.textContent = payload.better_if;
-          avoidIfNode.textContent = payload.avoid_if;
-          keyInsightNode.textContent = payload.key_insight || "";
-          summaryNode.textContent = payload.one_line_summary;
-
-          if (payload.real_problem.trim() !== payload.claimed_problem.trim()) {
-            realProblemNode.classList.add("emphasis");
-          }
+          if (p.real_problem.trim() !== p.claimed_problem.trim())
+            realProbEl.classList.add("emphasis");
 
           showEl(resultsShell);
-          animateScore(payload.score, color);
+          animateScore(p.score, color);
           resultsShell.scrollIntoView({ behavior: "smooth", block: "start" });
         }
 
         /* ── RESET TO HERO ── */
         async function resetToHero() {
-          setInteractiveState(false);
-          stopSpinner();
-          analysisErrorNode.textContent = "";
+          activeRequest = false;
+          stopTerminal();
+          analysisErrorEl.textContent = "";
           await hideEl(analysisScreen);
           await hideEl(resultsShell);
           resetResults();
           queryInput.value = "";
           showEl(heroSection);
-          // re-run scramble on return
           setTimeout(
             () => scrambleText(heroTitleEl, "Truth over hype.", 800),
             200,
@@ -1633,10 +1645,10 @@
           window.scrollTo({ top: 0, behavior: "smooth" });
         }
 
-        /* ── SET INTERACTIVE STATE ── */
-        function setInteractiveState(busy) {
+        /* ── INTERACTIVE STATE ── */
+        function setBusy(busy) {
           queryInput.disabled = busy;
-          submitButton.disabled = busy;
+          submitBtn.disabled = busy;
           activeRequest = busy;
         }
 
@@ -1651,19 +1663,19 @@
 
           queryInput.value = query;
           resetResults();
-          setInteractiveState(true);
-          startLoadingBar();
+          setBusy(true);
+          startLoading();
 
           if (!heroSection.classList.contains("is-hidden"))
             await hideEl(heroSection);
           if (!resultsShell.classList.contains("is-hidden"))
             await hideEl(resultsShell);
 
-          analysisToolNode.textContent = query.toUpperCase();
-          analysisTitleNode.textContent = "Analysis of " + query;
-          analysisErrorNode.textContent = "";
+          analysisToolLbl.textContent = query.toUpperCase();
+          analysisTitleEl.textContent = "Analysis of " + query;
+          analysisErrorEl.textContent = "";
           showEl(analysisScreen);
-          startSpinner();
+          startTerminal(query);
 
           try {
             const res = await fetch("/api/analyze", {
@@ -1683,38 +1695,30 @@
               "real_cost",
               "verdict",
               "score",
-              "better_if",
-              "avoid_if",
               "key_insight",
               "one_line_summary",
             ];
-            if (
-              !payload ||
-              !required.every((k) =>
-                Object.prototype.hasOwnProperty.call(payload, k),
-              )
-            ) {
-              throw new Error("Incomplete analysis response.");
-            }
+            if (!payload || !required.every((k) => k in payload))
+              throw new Error("Incomplete response.");
 
-            finishLoadingBar();
+            finishLoading();
             setCount(getCount() + 1);
-            rememberAnalysis(query);
-            stopSpinner();
-            await wait(300);
+            remember(query);
+            stopTerminal();
+            await wait(400);
             await hideEl(analysisScreen);
             renderResults(payload);
           } catch (err) {
-            finishLoadingBar();
-            stopSpinner();
-            analysisErrorNode.textContent =
+            finishLoading();
+            stopTerminal();
+            analysisErrorEl.textContent =
               err instanceof Error ? err.message : "Something went wrong.";
             await wait(1000);
             await hideEl(analysisScreen);
             showEl(heroSection);
             queryInput.focus();
           } finally {
-            setInteractiveState(false);
+            setBusy(false);
           }
         }
 
@@ -1724,7 +1728,7 @@
           await startAnalysis(queryInput.value);
         });
         analyzeAnotherBtn.addEventListener("click", resetToHero);
-        clearHistoryButton.addEventListener("click", () => {
+        clearHistBtn.addEventListener("click", () => {
           localStorage.removeItem(HISTORY_KEY);
           renderHistory();
         });
@@ -1732,8 +1736,6 @@
         /* ── INIT ── */
         setCount(getCount());
         renderHistory();
-
-        // run scramble after intro animation settles
         setTimeout(
           () => scrambleText(heroTitleEl, "Truth over hype.", 1400),
           800,

@@ -2,7 +2,6 @@ function readBody(req) {
   if (req.body && typeof req.body === "object") {
     return Promise.resolve(req.body);
   }
-
   return new Promise((resolve, reject) => {
     let raw = "";
     req.on("data", (chunk) => {
@@ -11,7 +10,7 @@ function readBody(req) {
     req.on("end", () => {
       try {
         resolve(raw ? JSON.parse(raw) : {});
-      } catch (error) {
+      } catch (e) {
         reject(new Error("Invalid JSON body"));
       }
     });
@@ -36,12 +35,11 @@ module.exports = async function handler(req, res) {
 
     try {
       const url = new URL(query.trim());
-      if (url.protocol === "http:" || url.protocol === "https:") {
-        isUrl = true;
-      }
-    } catch (error) {}
+      if (url.protocol === "http:" || url.protocol === "https:") isUrl = true;
+    } catch (e) {}
 
     if (isUrl) {
+      // Method 1: Jina AI Reader
       try {
         const jinaRes = await fetch(`https://r.jina.ai/${query.trim()}`, {
           headers: {
@@ -53,12 +51,13 @@ module.exports = async function handler(req, res) {
         if (jinaRes.ok) {
           const text = await jinaRes.text();
           if (text && text.length > 200) {
-            toolContent = `Website content for analysis:\n\n${text.substring(0, 4000)}`;
+            toolContent = `Website content:\n\n${text.substring(0, 4000)}`;
             scrapedSuccessfully = true;
           }
         }
-      } catch (error) {}
+      } catch (e) {}
 
+      // Method 2: Direct fetch fallback
       if (!scrapedSuccessfully) {
         try {
           const directRes = await fetch(query.trim(), {
@@ -80,46 +79,55 @@ module.exports = async function handler(req, res) {
               .replace(/\s+/g, " ")
               .trim();
             if (text && text.length > 200) {
-              toolContent = `Website text content:\n\n${text.substring(0, 4000)}`;
+              toolContent = `Website text:\n\n${text.substring(0, 4000)}`;
               scrapedSuccessfully = true;
             }
           }
-        } catch (error) {}
+        } catch (e) {}
       }
 
+      // Method 3: domain fallback
       if (!scrapedSuccessfully) {
         try {
           const urlObj = new URL(query.trim());
           const domain = urlObj.hostname.replace("www.", "");
-          toolContent = `${domain} (analyze based on your knowledge of this product)`;
-        } catch (error) {}
+          toolContent = domain;
+        } catch (e) {}
       }
     }
 
-    const systemPrompt = `You are a brutally honest AI product analyst. You always return ONLY a valid JSON object — no markdown, no text before or after.
+    const systemPrompt = `You are a brutally honest AI product analyst. Return ONLY a valid JSON object — no markdown, no explanation, nothing else.
 
-You are SKEPTICAL by default. Most AI SaaS tools are wrappers around OpenAI/Anthropic APIs with minimal added value. Your job is to expose this clearly.
+You analyze AI SaaS tools and expose the truth about whether they solve real problems or are expensive wrappers around OpenAI/Anthropic APIs.
 
-VERDICT RULES — follow strictly:
-- "Expensive Wrapper": the tool adds a UI on top of an existing API and charges $20-200/month for something the API itself or a free tool already does. This applies to 70%+ of AI tools on the market.
-- "Real Solution": the tool has proprietary technology, unique data, genuine workflow integration, or solves a problem that cannot be replicated with a prompt. This is rare.
-- "Unclear": only when you genuinely cannot determine the core technology.
+VERDICT CRITERIA — be strict:
+"Expensive Wrapper": charges $20-200/month to wrap an API call you could do yourself in ChatGPT or with a free tool. No proprietary data, no unique technology, no real workflow integration. This is 70-80% of the AI SaaS market.
+"Real Solution": has proprietary technology, unique datasets, deep workflow integration, or solves something technically impossible with a simple prompt. Genuinely rare.
+"Unclear": only if you truly cannot determine the core technology stack.
 
-Do NOT give "Real Solution" just because a tool is popular or well-funded. Popularity is not value.
+SCORING — be harsh:
+1-3: pure wrapper, zero proprietary value
+4-5: minor workflow value but still largely a wrapper  
+6-7: some genuine value but overpriced for what it does
+8-10: only for tools with real proprietary technology and proven ROI
 
-CRITICAL RULES:
-- free_alternative: ONLY 100% free tools. Never paid or freemium. If none exist write: "No free alternative — this fills a real gap."
-- real_cost: realistic monthly cost for a typical user
-- target_audience: specific, not generic
-- better_if: the ONE scenario where this tool genuinely makes sense
-- avoid_if: the most common case where people waste money on this
-- key_insight: the uncomfortable truth most users discover too late
-- score: 1-4 for wrappers, 5-6 for unclear, 7-10 only for genuine solutions with proprietary value
-- All fields: max 20 words, sharp and direct`;
+FREE ALTERNATIVE — always suggest truly free tools only. Open source or permanent free tier. Never trials. Never freemium with heavy limits. If none: "No free alternative — this fills a real gap."
+
+EXAMPLES of correct verdicts:
+- Jasper AI → "Expensive Wrapper" (score: 2) — GPT wrapper for copywriting, ChatGPT does the same
+- Copy.ai → "Expensive Wrapper" (score: 2) — identical to Jasper, zero proprietary tech
+- Cursor → "Real Solution" (score: 9) — proprietary codebase context system, not replicable with prompts
+- GitHub Copilot → "Real Solution" (score: 8) — deep IDE integration, trained on unique code data
+- Notion AI → "Expensive Wrapper" (score: 3) — GPT added to Notion, use ChatGPT directly
+- Midjourney → "Real Solution" (score: 9) — proprietary model, unique aesthetic, not replicable
+- Grammarly → "Real Solution" (score: 7) — proprietary grammar model + unique writing database
+- Any "AI [task] tool" charging $49/month → almost certainly "Expensive Wrapper"
+
+Return JSON with these exact keys: claimed_problem, real_problem, free_alternative, target_audience, real_cost, verdict, score, key_insight, one_line_summary`;
 
     const userPrompt = scrapedSuccessfully
-      ? `Analyze this AI/SaaS tool based on its actual website content below. Be specific and accurate.\n\n${toolContent}\n\nReturn ONLY a JSON object with exactly these keys: claimed_problem, real_problem, free_alternative, target_audience, real_cost, verdict (exactly one of: "Real Solution", "Expensive Wrapper", "Unclear"), score (integer 1-10), better_if, avoid_if, key_insight, one_line_summary`
-      : `Analyze this AI/SaaS tool: "${toolContent}"\n\nUse your full knowledge of this product. Return ONLY a JSON object with exactly these keys: claimed_problem, real_problem, free_alternative, target_audience, real_cost, verdict (exactly one of: "Real Solution", "Expensive Wrapper", "Unclear"), score (integer 1-10), better_if, avoid_if, key_insight, one_line_summary`;
+      ? `Analyze this AI tool based on its website content. Be direct and honest.\n\n${toolContent}\n\nReturn ONLY JSON with keys: claimed_problem, real_problem, free_alternative, target_audience, real_cost, verdict (exactly: "Real Solution" or "Expensive Wrapper" or "Unclear"), score (integer 1-10), key_insight, one_line_summary`
+      : `Analyze this AI tool: "${toolContent}"\n\nReturn ONLY JSON with keys: claimed_problem, real_problem, free_alternative, target_audience, real_cost, verdict (exactly: "Real Solution" or "Expensive Wrapper" or "Unclear"), score (integer 1-10), key_insight, one_line_summary`;
 
     const groqRes = await fetch(
       "https://api.groq.com/openai/v1/chat/completions",
@@ -135,8 +143,8 @@ CRITICAL RULES:
             { role: "system", content: systemPrompt },
             { role: "user", content: userPrompt },
           ],
-          temperature: 0.2,
-          max_tokens: 700,
+          temperature: 0.1,
+          max_tokens: 600,
         }),
       },
     );
@@ -156,7 +164,6 @@ CRITICAL RULES:
       .replace(/^```\n?/i, "")
       .replace(/\n?```$/i, "")
       .trim();
-
     const jsonMatch = content.match(/\{[\s\S]*\}/);
     if (jsonMatch) content = jsonMatch[0];
 
@@ -174,15 +181,11 @@ CRITICAL RULES:
       "real_cost",
       "verdict",
       "score",
-      "better_if",
-      "avoid_if",
       "key_insight",
       "one_line_summary",
     ];
-    fields.forEach((field) => {
-      if (!parsed[field])
-        parsed[field] =
-          field === "score" ? 5 : "Analysis incomplete for this field.";
+    fields.forEach((f) => {
+      if (!parsed[f]) parsed[f] = f === "score" ? 5 : "—";
     });
 
     return res.status(200).json(parsed);
